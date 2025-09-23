@@ -13,11 +13,11 @@ const storage = new CloudinaryStorage({
   cloudinary: cloudinary,
   params: {
     folder: 'crowdfund_platform',
-    // Add 'webp' to this list
     allowed_formats: ['jpeg', 'png', 'jpg', 'webp'],
   },
 });
 
-const upload = multer({ storage: storage });
+// ✅ this is a multer instance with storage attached
+const upload = multer({ storage });
 
-module.exports = upload;
+module.exports = { cloudinary, upload };

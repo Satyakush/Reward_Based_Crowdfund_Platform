@@ -1,13 +1,13 @@
-// server/routes/uploadRoutes.js
 const express = require('express');
 const router = express.Router();
-const upload = require('../config/cloudinary');
+const { upload } = require('../config/cloudinary'); // ✅ destructure upload
 
 router.post('/', upload.single('image'), (req, res) => {
   if (!req.file) {
     return res.status(400).send('No file uploaded.');
   }
-  // Send back the secure URL of the uploaded image
+
+  // ✅ CloudinaryStorage puts the Cloudinary URL in req.file.path
   res.status(200).json({ imageUrl: req.file.path });
 });
 
