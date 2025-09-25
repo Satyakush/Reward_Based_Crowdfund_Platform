@@ -80,7 +80,8 @@ npm install
  Run the Application
 
  In your first terminal (from /server):
- npm run dev
+ npm install
+npm start
 
  In your second terminal (from /client):
  npm run dev
