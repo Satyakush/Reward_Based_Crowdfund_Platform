@@ -9,6 +9,7 @@ export const AuthProvider = ({ children }) => {
 
   const clearAuth = () => {
     localStorage.removeItem('token');
+    sessionStorage.removeItem('token');
     delete axios.defaults.headers.common.Authorization;
     setUser(null);
   };
@@ -37,8 +38,9 @@ export const AuthProvider = ({ children }) => {
     restoreSession();
   }, []);
 
-  const login = (token, userData = null) => {
-    localStorage.setItem('token', token);
+  const login = (token, userData = null, remember = false) => {
+    const storage = remember ? localStorage : sessionStorage;
+    storage.setItem('token', token);
     axios.defaults.headers.common.Authorization = `Bearer ${token}`;
     setUser(userData);
   };
