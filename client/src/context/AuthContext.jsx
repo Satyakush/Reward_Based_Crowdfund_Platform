@@ -1,37 +1,52 @@
-// src/context/AuthContext.js
-import { createContext, useState, useEffect } from 'react';
+import { createContext, useEffect, useState } from 'react';
 import axios from 'axios';
 
 export const AuthContext = createContext(null);
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
+  const [authLoading, setAuthLoading] = useState(true);
 
-  useEffect(() => {
-    // Check if a token exists in localStorage when the app loads
-    const token = localStorage.getItem('token');
-    if (token) {
-      // If you need to store user details, you would decode the token here
-      // For now, we'll just confirm that a user is "logged in" if a token exists
-      setUser({ token });
-      axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-    }
-  }, []);
-
-  const login = (token) => {
-    localStorage.setItem('token', token);
-    axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-    setUser({ token });
-  };
-
-  const logout = () => {
+  const clearAuth = () => {
     localStorage.removeItem('token');
-    delete axios.defaults.headers.common['Authorization'];
+    delete axios.defaults.headers.common.Authorization;
     setUser(null);
   };
 
+  useEffect(() => {
+    const restoreSession = async () => {
+      const token = localStorage.getItem('token');
+
+      if (!token) {
+        setAuthLoading(false);
+        return;
+      }
+
+      axios.defaults.headers.common.Authorization = `Bearer ${token}`;
+
+      try {
+        const { data } = await axios.get('/api/auth/me');
+        setUser(data.user);
+      } catch (error) {
+        clearAuth();
+      } finally {
+        setAuthLoading(false);
+      }
+    };
+
+    restoreSession();
+  }, []);
+
+  const login = (token, userData = null) => {
+    localStorage.setItem('token', token);
+    axios.defaults.headers.common.Authorization = `Bearer ${token}`;
+    setUser(userData);
+  };
+
+  const logout = () => clearAuth();
+
   return (
-    <AuthContext.Provider value={{ user, login, logout }}>
+    <AuthContext.Provider value={{ user, login, logout, authLoading }}>
       {children}
     </AuthContext.Provider>
   );
