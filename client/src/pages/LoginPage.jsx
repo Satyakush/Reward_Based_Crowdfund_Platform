@@ -6,6 +6,7 @@ import { toast } from 'react-toastify';
 
 const LoginPage = () => {
   const [formData, setFormData] = useState({ email: '', password: '' });
+  const [remember, setRemember] = useState(false);
   const [loading, setLoading] = useState(false);
   const { login } = useContext(AuthContext);
   const navigate = useNavigate();
@@ -16,7 +17,7 @@ const LoginPage = () => {
     setLoading(true);
     try {
       const { data } = await axios.post('/api/auth/login', formData);
-      login(data.token, data.user);
+      login(data.token, data.user, remember);
       navigate(location.state?.from || '/my-campaigns', { replace: true });
     } catch (err) {
       toast.error(err.response?.data?.message || 'Unable to sign in. Please check your credentials.');
@@ -69,7 +70,7 @@ const LoginPage = () => {
                 <input type="password" value={formData.password} onChange={(e) => setFormData({ ...formData, password: e.target.value })} required autoComplete="current-password" placeholder="••••••••"
                   className="mt-2 w-full rounded-2xl border border-white/10 bg-black/20 px-4 py-3.5 text-white outline-none placeholder:text-slate-600 transition focus:border-emerald-400 focus:ring-4 focus:ring-emerald-400/10" />
               </label>
-              <button disabled={loading} className="group flex w-full items-center justify-center gap-2 rounded-2xl bg-emerald-300 py-3.5 font-black text-slate-950 transition hover:-translate-y-0.5 hover:bg-emerald-200 disabled:cursor-not-allowed disabled:opacity-60">
+              <label className="flex cursor-pointer items-center gap-2 text-sm text-slate-400"><input type="checkbox" checked={remember} onChange={e=>setRemember(e.target.checked)} className="h-4 w-4 accent-emerald-300" /> Remember me</label><button disabled={loading} className="group flex w-full items-center justify-center gap-2 rounded-2xl bg-emerald-300 py-3.5 font-black text-slate-950 transition hover:-translate-y-0.5 hover:bg-emerald-200 disabled:cursor-not-allowed disabled:opacity-60">
                 {loading ? 'Signing you in...' : <>Continue <span className="transition group-hover:translate-x-1">→</span></>}
               </button>
             </form>
