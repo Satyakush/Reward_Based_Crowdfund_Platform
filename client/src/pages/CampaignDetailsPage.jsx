@@ -13,6 +13,7 @@ const CampaignDetailsPage = () => {
   const [campaign, setCampaign] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [payingRewardId, setPayingRewardId] = useState(null);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -45,24 +46,72 @@ const CampaignDetailsPage = () => {
     }
   };
 
-  const handlePledge = async (pledgeAmount) => {
+  const handlePledge = async (reward) => {
     if (!user) {
       navigate('/login');
       return;
     }
 
-    if (!window.confirm(`Are you sure you want to pledge ${formatCurrency(pledgeAmount)}?`)) return;
+    if (campaignStats.ended || campaignStats.percentage >= 100) return;
 
+    setPayingRewardId(reward._id);
     try {
+      const loaded = await new Promise((resolve) => {
+        if (window.Razorpay) return resolve(true);
+        const script = document.createElement('script');
+        script.src = 'https://checkout.razorpay.com/v1/checkout.js';
+        script.onload = () => resolve(true);
+        script.onerror = () => resolve(false);
+        document.body.appendChild(script);
+      });
+      if (!loaded) throw new Error('Razorpay checkout could not be loaded.');
+
       const { data } = await axios.post(
-        `/api/campaigns/${id}/pledge`,
-        { pledgeAmount },
+        `/api/payments/campaigns/${id}/order`,
+        { rewardId: reward._id },
         { headers: { Authorization: `Bearer ${localStorage.getItem('token') || sessionStorage.getItem('token')}` } }
       );
-      setCampaign(data);
-      toast.success('Thank you for backing this campaign!');
-    } catch (err) {
-      toast.error(err.response?.data?.message || 'Pledge failed. Please try again.');
+
+      const options = {
+        key: data.keyId,
+        amount: data.amount,
+        currency: data.currency,
+        name: 'CrowdFund',
+        description: `Backing: ${campaign.title}`,
+        order_id: data.orderId,
+        handler: async (response) => {
+          try {
+            await axios.post(
+              `/api/payments/campaigns/${id}/verify`,
+              {
+                razorpayOrderId: response.razorpay_order_id,
+                razorpayPaymentId: response.razorpay_payment_id,
+                razorpaySignature: response.razorpay_signature,
+              },
+              { headers: { Authorization: `Bearer ${localStorage.getItem('token') || sessionStorage.getItem('token')}` } }
+            );
+            toast.success('Payment completed. Thank you for backing this campaign!');
+            const refreshed = await axios.get(`/api/campaigns/${id}`);
+            setCampaign(refreshed.data);
+          } catch (verificationError) {
+            toast.error(verificationError.response?.data?.message || 'Payment verification failed.');
+          } finally {
+            setPayingRewardId(null);
+          }
+        },
+        modal: { ondismiss: () => setPayingRewardId(null) },
+        theme: { color: '#10b981' },
+      };
+
+      const razorpay = new window.Razorpay(options);
+      razorpay.on('payment.failed', (response) => {
+        toast.error(response.error?.description || 'Payment failed.');
+        setPayingRewardId(null);
+      });
+      razorpay.open();
+    } catch (paymentError) {
+      toast.error(paymentError.response?.data?.message || paymentError.message || 'Unable to start payment.');
+      setPayingRewardId(null);
     }
   };
 
@@ -226,11 +275,11 @@ const CampaignDetailsPage = () => {
                       </div>
                       <p className="mt-2 text-sm leading-6 text-slate-500">{reward.description}</p>
                       <button
-                        onClick={() => handlePledge(reward.pledgeAmount)}
-                        disabled={campaignStats.ended || campaignStats.percentage >= 100}
+                        onClick={() => handlePledge(reward)}
+                        disabled={campaignStats.ended || campaignStats.percentage >= 100 || payingRewardId === reward._id}
                         className="mt-4 w-full rounded-xl bg-slate-950 py-3 text-sm font-black text-white transition hover:bg-emerald-600 disabled:cursor-not-allowed disabled:bg-slate-300"
                       >
-                        {campaignStats.ended ? 'Campaign ended' : campaignStats.percentage >= 100 ? 'Goal reached' : user ? `Pledge ${formatCurrency(reward.pledgeAmount)}` : 'Login to pledge'}
+                        {campaignStats.ended ? 'Campaign ended' : campaignStats.percentage >= 100 ? 'Goal reached' : payingRewardId === reward._id ? 'Opening payment...' : user ? `Back for ${formatCurrency(reward.pledgeAmount)}` : 'Login to pledge'}
                       </button>
                     </div>
                   )) : (
