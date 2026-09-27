@@ -22,6 +22,8 @@ app.get('/api/health', (req, res) => res.json({ status: 'ok', service: 'crowdfun
 app.use('/api/auth', authRoutes);
 app.use('/api/campaigns', campaignRoutes);
 app.use('/api/payments', require('./routes/paymentRoutes'));
+app.use('/api/dashboard', require('./routes/dashboardRoutes'));
+app.use('/api/notifications', require('./routes/notificationRoutes'));
 app.use('/api/upload', uploadRoutes);
 app.use('/api/payment-webhooks', require('./routes/paymentWebhookRoutes'));
 
