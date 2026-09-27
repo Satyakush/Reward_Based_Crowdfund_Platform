@@ -1,6 +1,7 @@
 const crypto = require('crypto');
 const Campaign = require('../models/Campaign');
 const Payment = require('../models/Payment');
+const Notification = require('../models/Notification);
 const getRazorpay = require('../config/razorpay');
 
 const MAX_PAYMENT_AMOUNT = 1000000;
