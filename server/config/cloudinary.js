@@ -1,4 +1,3 @@
-// server/config/cloudinary.js
 const cloudinary = require('cloudinary').v2;
 const { CloudinaryStorage } = require('multer-storage-cloudinary');
 const multer = require('multer');
@@ -10,14 +9,24 @@ cloudinary.config({
 });
 
 const storage = new CloudinaryStorage({
-  cloudinary: cloudinary,
+  cloudinary,
   params: {
     folder: 'crowdfund_platform',
     allowed_formats: ['jpeg', 'png', 'jpg', 'webp'],
+    resource_type: 'image',
   },
 });
 
-// ✅ this is a multer instance with storage attached
-const upload = multer({ storage });
+const upload = multer({
+  storage,
+  limits: { fileSize: 5 * 1024 * 1024 },
+  fileFilter: (req, file, cb) => {
+    const allowed = ['image/jpeg', 'image/png', 'image/webp'];
+    if (!allowed.includes(file.mimetype)) {
+      return cb(new Error('Only JPG, PNG and WEBP images are allowed.'));
+    }
+    cb(null, true);
+  },
+});
 
 module.exports = { cloudinary, upload };
