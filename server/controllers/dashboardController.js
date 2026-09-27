@@ -5,7 +5,7 @@ const getDashboard = async (req, res, next) => {
   try {
     const [campaigns, payments] = await Promise.all([
       Campaign.find({ creator: req.user._id }).sort({ createdAt: -1 }).populate('creator', '_id name'),
-      Payment.find({ backer: req.user._id, status: 'paid' }).sort({ paidAt: -1 }).populate('campaign', '_id title imageUrl'),
+      Payment.find({ backer: req.user._id, status: 'paid' }).sort({ paidAt: -1 }).populate('campaign', '_id title imageUrl rewards'),
     ]);
 
     const creator = campaigns.reduce((acc, campaign) => {
