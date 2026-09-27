@@ -92,7 +92,7 @@ const verifyPayment = async (req, res) => {
 
 const finalizePayment = async (paymentId, razorpayPaymentId, signature = null, capturedAmount) => {
   const paymentRecord = await Payment.findOneAndUpdate({ _id: paymentId, status: 'created' }, { $set: { status: 'processing' } }, { new: true });
-  if (!paymentRecord) return await Payment.findById(paymentId);
+  if (!paymentRecord) return null;
   if (capturedAmount !== Number(paymentRecord.amount)) {
     await Payment.findByIdAndUpdate(paymentId, { $set: { status: 'created' } });
     return null;
