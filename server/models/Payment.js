@@ -6,7 +6,7 @@ const paymentSchema = new mongoose.Schema({
   reward: { type: mongoose.Schema.Types.ObjectId, required: false },
   amount: { type: Number, required: true, min: 1 },
   currency: { type: String, default: 'INR', uppercase: true, trim: true },
-  status: { type: String, enum: ['created', 'paid', 'failed'], default: 'created', index: true },
+  status: { type: String, enum: ['created', 'processing', 'paid', 'failed'], default: 'created', index: true },
   razorpayOrderId: { type: String, required: true, unique: true, index: true },
   razorpayPaymentId: { type: String, default: null, unique: true, sparse: true, index: true },
   razorpaySignature: { type: String, default: null },
