@@ -53,23 +53,20 @@ const createCampaign = async (req, res, next) => {
 
 const getCampaigns = async (req, res, next) => {
   try {
-    const page = Math.max(1, Number.parseInt(req.query.page, 10) || 1);
-    const limit = Math.min(24, Math.max(1, Number.parseInt(req.query.limit, 10) || 12));
-    const skip = (page - 1) * limit;
     const search = String(req.query.search || '').trim();
-    const filter = search ? { $or: [{ title: { $regex: search, $options: 'i' } }, { story: { $regex: search, $options: 'i' } }] } : {};
+    const filter = search
+      ? { $or: [{ title: { $regex: search, $options: 'i' } }, { story: { $regex: search, $options: 'i' } }] }
+      : {};
 
-    const [campaigns, total] = await Promise.all([
-      Campaign.find(filter).populate('creator', '_id name').sort({ createdAt: -1 }).skip(skip).limit(limit),
-      Campaign.countDocuments(filter),
-    ]);
+    const campaigns = await Campaign.find(filter)
+      .populate('creator', '_id name')
+      .sort({ createdAt: -1 });
 
-    res.json({ campaigns, pagination: { page, limit, total, pages: Math.ceil(total / limit) } });
+    res.json(campaigns);
   } catch (error) {
     next(error);
   }
 };
-
 const getCampaignById = async (req, res, next) => {
   if (!validId(req.params.id)) return res.status(400).json({ message: 'Invalid campaign ID.' });
   try {
