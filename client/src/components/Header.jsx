@@ -31,8 +31,8 @@ const Header = () => {
 
           {user ? (
             <>
-              <Link to="/my-campaigns" className="rounded-xl px-3 py-2 text-sm font-semibold text-slate-300 transition hover:bg-white/5 hover:text-white">
-                Dashboard
+              <Link to="/dashboard" className="rounded-xl px-3 py-2 text-sm font-semibold text-slate-300 transition hover:bg-white/5 hover:text-white">
+                Activity
               </Link>
               <Link
                 to="/create-campaign"
