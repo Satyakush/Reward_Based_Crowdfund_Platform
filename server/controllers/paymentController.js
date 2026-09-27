@@ -91,10 +91,12 @@ const verifyPayment = async (req, res) => {
 };
 
 const finalizePayment = async (paymentId, razorpayPaymentId, signature = null, capturedAmount) => {
-  const paymentRecord = await Payment.findById(paymentId);
-  if (!paymentRecord || paymentRecord.status === 'paid') return paymentRecord;
-
-  if (capturedAmount !== Number(paymentRecord.amount)) return null;
+  const paymentRecord = await Payment.findOneAndUpdate({ _id: paymentId, status: 'created' }, { $set: { status: 'processing' } }, { new: true });
+  if (!paymentRecord) return await Payment.findById(paymentId);
+  if (capturedAmount !== Number(paymentRecord.amount)) {
+    await Payment.findByIdAndUpdate(paymentId, { $set: { status: 'created' } });
+    return null;
+  }
 
   const campaign = await Campaign.findOneAndUpdate(
     { _id: paymentRecord.campaign, amountRaised: { $lte: Number.MAX_SAFE_INTEGER - capturedAmount }, $expr: { $lte: [{ $add: ['$amountRaised', capturedAmount] }, '$goalAmount'] } },
