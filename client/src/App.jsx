@@ -8,6 +8,7 @@ import CreateCampaignPage from './pages/CreateCampaignPage';
 import CampaignDetailsPage from './pages/CampaignDetailsPage';
 import MyCampaignsPage from './pages/MyCampaignsPage';
 import EditCampaignPage from './pages/EditCampaignPage';
+import DashboardPage from './pages/DashboardPage';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
@@ -26,6 +27,7 @@ function App() {
           <Route path="/campaign/:id" element={<CampaignDetailsPage />} />
 
           <Route element={<ProtectedRoute />}>
+            <Route path="/dashboard" element={<DashboardPage />} />
             <Route path="/create-campaign" element={<CreateCampaignPage />} />
             <Route path="/my-campaigns" element={<MyCampaignsPage />} />
             <Route path="/edit-campaign/:id" element={<EditCampaignPage />} />
