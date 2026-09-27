@@ -10,7 +10,7 @@ const StatIcon = ({ children }) => (
   </div>
 );
 
-const formatCurrency = (value = 0) => `$${Number(value).toLocaleString()}`;
+const formatCurrency = (value = 0) => `₹${Number(value).toLocaleString('en-IN')}`;
 
 const getProgress = (campaign) => {
   if (!campaign?.goalAmount) return 0;
