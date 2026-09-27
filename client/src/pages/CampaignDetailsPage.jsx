@@ -5,7 +5,7 @@ import { AuthContext } from '../context/AuthContext.jsx';
 import { toast } from 'react-toastify';
 import { motion } from 'framer-motion';
 
-const formatCurrency = (value = 0) => `$${Number(value).toLocaleString()}`;
+const formatCurrency = (value = 0) => `₹${Number(value).toLocaleString('en-IN')}`;
 
 const CampaignDetailsPage = () => {
   const { id } = useParams();
