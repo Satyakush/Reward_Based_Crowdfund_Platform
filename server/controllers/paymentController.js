@@ -1,7 +1,7 @@
 const crypto = require('crypto');
 const Campaign = require('../models/Campaign');
 const Payment = require('../models/Payment');
-const Notification = require('../models/Notification);
+const Notification = require('../models/Notification');
 const getRazorpay = require('../config/razorpay');
 
 const MAX_PAYMENT_AMOUNT = 1000000;
@@ -108,6 +108,8 @@ const finalizePayment = async (paymentId, razorpayPaymentId, signature = null, c
   paymentRecord.razorpaySignature = signature;
   paymentRecord.paidAt = new Date();
   await paymentRecord.save();
+  await Notification.create({ user: paymentRecord.backer, type: 'payment_success', title: 'Payment successful', message: `Your contribution to “${campaign.title}” was confirmed.`, campaign: campaign._id, payment: paymentRecord._id });
+  if (Number(campaign.amountRaised) >= Number(campaign.goalAmount)) await Notification.create({ user: campaign.creator, type: 'campaign_funded', title: 'Campaign fully funded', message: `“${campaign.title}” has reached its funding goal.`, campaign: campaign._id, payment: paymentRecord._id });
   return paymentRecord;
 };
 
