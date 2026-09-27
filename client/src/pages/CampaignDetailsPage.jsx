@@ -36,7 +36,7 @@ const CampaignDetailsPage = () => {
 
     try {
       await axios.delete(`/api/campaigns/${id}`, {
-        headers: { Authorization: `Bearer ${user.token}` },
+        headers: { Authorization: `Bearer ${localStorage.getItem('token') || sessionStorage.getItem('token')}` },
       });
       toast.success('Campaign successfully deleted.');
       navigate('/');
@@ -57,7 +57,7 @@ const CampaignDetailsPage = () => {
       const { data } = await axios.post(
         `/api/campaigns/${id}/pledge`,
         { pledgeAmount },
-        { headers: { Authorization: `Bearer ${user.token}` } }
+        { headers: { Authorization: `Bearer ${localStorage.getItem('token') || sessionStorage.getItem('token')}` } }
       );
       setCampaign(data);
       toast.success('Thank you for backing this campaign!');
