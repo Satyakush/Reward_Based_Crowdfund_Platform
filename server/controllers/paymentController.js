@@ -101,7 +101,10 @@ const finalizePayment = async (paymentId, razorpayPaymentId, signature = null, c
     { $inc: { amountRaised: capturedAmount }, $push: { backers: { user: paymentRecord.backer, amount: capturedAmount } } },
     { new: true }
   );
-  if (!campaign) return null;
+  if (!campaign) {
+    await Payment.findByIdAndUpdate(paymentId, { $set: { status: 'created' } });
+    return null;
+  }
 
   paymentRecord.status = 'paid';
   paymentRecord.razorpayPaymentId = razorpayPaymentId;
