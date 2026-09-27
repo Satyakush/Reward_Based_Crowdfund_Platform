@@ -21,7 +21,9 @@ app.get('/api/health', (req, res) => res.json({ status: 'ok', service: 'crowdfun
 
 app.use('/api/auth', authRoutes);
 app.use('/api/campaigns', campaignRoutes);
+app.use('/api/payments', require('./routes/paymentRoutes'));
 app.use('/api/upload', uploadRoutes);
+app.use('/api/payment-webhooks', require('./routes/paymentWebhookRoutes'));
 
 app.use((req, res) => res.status(404).json({ message: 'Route not found.' }));
 app.use(errorHandler);
