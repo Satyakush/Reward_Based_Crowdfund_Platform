@@ -114,8 +114,32 @@ const finalizePayment = async (paymentId, razorpayPaymentId, signature = null, c
   paymentRecord.razorpaySignature = signature;
   paymentRecord.paidAt = new Date();
   await paymentRecord.save();
-  await Notification.create({ user: paymentRecord.backer, type: 'payment_success', title: 'Payment successful', message: `Your contribution to “${campaign.title}” was confirmed.`, campaign: campaign._id, payment: paymentRecord._id });
-  if (Number(campaign.amountRaised) >= Number(campaign.goalAmount)) await Notification.create({ user: campaign.creator, type: 'campaign_funded', title: 'Campaign fully funded', message: `“${campaign.title}” has reached its funding goal.`, campaign: campaign._id, payment: paymentRecord._id });
+
+  // Notifications are secondary side effects; a notification failure must not
+  // turn an already-confirmed payment into a false frontend error.
+  const notificationJobs = [
+    Notification.create({
+      user: paymentRecord.backer,
+      type: 'payment_success',
+      title: 'Payment successful',
+      message: `Your contribution to “${campaign.title}” was confirmed.`,
+      campaign: campaign._id,
+      payment: paymentRecord._id,
+    }),
+  ];
+
+  if (Number(campaign.amountRaised) >= Number(campaign.goalAmount)) {
+    notificationJobs.push(Notification.create({
+      user: campaign.creator,
+      type: 'campaign_funded',
+      title: 'Campaign fully funded',
+      message: `“${campaign.title}” has reached its funding goal.`,
+      campaign: campaign._id,
+      payment: paymentRecord._id,
+    }));
+  }
+
+  await Promise.allSettled(notificationJobs);
   return paymentRecord;
 };
 
