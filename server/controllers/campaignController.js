@@ -4,6 +4,17 @@ const { cloudinary } = require('../config/cloudinary');
 
 const validId = (id) => mongoose.Types.ObjectId.isValid(id);
 
+const getCampaignStatus = (campaign) => {
+  if (Number(campaign.amountRaised || 0) >= Number(campaign.goalAmount || 0)) return 'funded';
+  if (new Date(campaign.endDate).getTime() <= Date.now()) return 'ended';
+  return 'active';
+};
+
+const withStatus = (campaign) => {
+  const item = campaign.toObject ? campaign.toObject() : campaign;
+  return { ...item, status: getCampaignStatus(item) };
+};
+
 const normalizeRewards = (rewards) => {
   if (!Array.isArray(rewards)) return [];
   return rewards.map((reward) => ({
@@ -45,7 +56,7 @@ const createCampaign = async (req, res, next) => {
     });
 
     const populated = await Campaign.findById(campaign._id).populate('creator', '_id name');
-    res.status(201).json(populated);
+    res.status(201).json(withStatus(populated));
   } catch (error) {
     next(error);
   }
@@ -62,7 +73,7 @@ const getCampaigns = async (req, res, next) => {
       .populate('creator', '_id name')
       .sort({ createdAt: -1 });
 
-    res.json(campaigns);
+    res.json(campaigns.map(withStatus));
   } catch (error) {
     next(error);
   }
@@ -72,7 +83,7 @@ const getCampaignById = async (req, res, next) => {
   try {
     const campaign = await Campaign.findById(req.params.id).populate('creator', '_id name');
     if (!campaign) return res.status(404).json({ message: 'Campaign not found.' });
-    res.json(campaign);
+    res.json(withStatus(campaign));
   } catch (error) {
     next(error);
   }
@@ -81,7 +92,7 @@ const getCampaignById = async (req, res, next) => {
 const getMyCampaigns = async (req, res, next) => {
   try {
     const campaigns = await Campaign.find({ creator: req.user._id }).populate('creator', '_id name').sort({ createdAt: -1 });
-    res.json(campaigns);
+    res.json(campaigns.map(withStatus));
   } catch (error) {
     next(error);
   }
@@ -93,6 +104,7 @@ const updateCampaign = async (req, res, next) => {
     const campaign = await Campaign.findById(req.params.id);
     if (!campaign) return res.status(404).json({ message: 'Campaign not found.' });
     if (campaign.creator.toString() !== req.user._id.toString()) return res.status(403).json({ message: 'You can only edit your own campaigns.' });
+    if (getCampaignStatus(campaign) !== 'active') return res.status(400).json({ message: 'Only active campaigns can be edited.' });
 
     const { title, story, goalAmount, endDate, imageUrl, rewards } = req.body;
     const nextValues = {
@@ -123,7 +135,7 @@ const updateCampaign = async (req, res, next) => {
     }
 
     const updated = await campaign.save();
-    res.json(await Campaign.findById(updated._id).populate('creator', '_id name'));
+    res.json(withStatus(await Campaign.findById(updated._id).populate('creator', '_id name')));
   } catch (error) {
     next(error);
   }
@@ -161,6 +173,7 @@ const pledgeToCampaign = async (req, res, next) => {
     const campaign = await Campaign.findById(req.params.id);
     if (!campaign) return res.status(404).json({ message: 'Campaign not found.' });
     if (campaign.creator.toString() === req.user._id.toString()) return res.status(400).json({ message: 'You cannot pledge to your own campaign.' });
+    if (getCampaignStatus(campaign) !== 'active') return res.status(400).json({ message: getCampaignStatus(campaign) === 'funded' ? 'This campaign is already fully funded.' : 'This campaign has ended.' });
     if (new Date(campaign.endDate).getTime() <= Date.now()) return res.status(400).json({ message: 'This campaign has ended.' });
 
     const remaining = campaign.goalAmount - campaign.amountRaised;
@@ -181,4 +194,4 @@ const pledgeToCampaign = async (req, res, next) => {
   }
 };
 
-module.exports = { createCampaign, getCampaigns, getCampaignById, pledgeToCampaign, getMyCampaigns, updateCampaign, deleteCampaign };
+module.exports = { createCampaign, getCampaigns, getCampaignById, pledgeToCampaign, getMyCampaigns, updateCampaign, deleteCampaign, getCampaignStatus, withStatus };
