@@ -137,7 +137,7 @@ const CreateCampaignPage = () => {
                     </div>
                     <div className="grid gap-4 sm:grid-cols-2">
                       <input value={reward.title} onChange={(e) => updateReward(index, 'title', e.target.value)} required placeholder="Reward title" className="rounded-xl border border-slate-200 bg-white px-4 py-3 outline-none focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10" />
-                      <input type="number" min="1" value={reward.pledgeAmount} onChange={(e) => updateReward(index, 'pledgeAmount', e.target.value)} required placeholder="Pledge amount ($)" className="rounded-xl border border-slate-200 bg-white px-4 py-3 outline-none focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10" />
+                      <input type="number" min="1" value={reward.pledgeAmount} onChange={(e) => updateReward(index, 'pledgeAmount', e.target.value)} required placeholder="Pledge amount (₹)" className="rounded-xl border border-slate-200 bg-white px-4 py-3 outline-none focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10" />
                     </div>
                     <input value={reward.description} onChange={(e) => updateReward(index, 'description', e.target.value)} required placeholder="What does the supporter receive?" className="mt-4 w-full rounded-xl border border-slate-200 bg-white px-4 py-3 outline-none focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10" />
                   </div>
@@ -155,7 +155,7 @@ const CreateCampaignPage = () => {
                 <p className="mt-2 text-sm leading-6 text-slate-400">Choose how much you need and when the campaign closes.</p>
 
                 <label className="mt-7 block"><span className="text-sm font-bold text-slate-200">Funding goal</span>
-                  <div className="mt-2 flex overflow-hidden rounded-2xl border border-white/10 bg-white/5"><span className="flex items-center px-4 text-emerald-300 font-black">$</span><input type="number" min="1" value={formData.goalAmount} onChange={(e) => updateField('goalAmount', e.target.value)} required placeholder="10000" className="w-full bg-transparent px-2 py-3.5 text-white outline-none placeholder:text-slate-600" /></div>
+                  <div className="mt-2 flex overflow-hidden rounded-2xl border border-white/10 bg-white/5"><span className="flex items-center px-4 text-emerald-300 font-black">₹</span><input type="number" min="1" value={formData.goalAmount} onChange={(e) => updateField('goalAmount', e.target.value)} required placeholder="10000" className="w-full bg-transparent px-2 py-3.5 text-white outline-none placeholder:text-slate-600" /></div>
                 </label>
 
                 <label className="mt-5 block"><span className="text-sm font-bold text-slate-200">Campaign end date</span>
