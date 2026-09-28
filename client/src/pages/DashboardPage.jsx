@@ -132,7 +132,7 @@ export default function DashboardPage() {
                   </div>
                 </div>
               )) : <p className="rounded-2xl bg-slate-50 p-6 text-center text-sm text-slate-500">No activity yet.</p>}
-            </div></div>
+            </div>
           </div>
         </section>
 
