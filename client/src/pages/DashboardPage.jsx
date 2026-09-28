@@ -38,6 +38,27 @@ export default function DashboardPage() {
 
   const recentPayments = useMemo(() => data?.payments?.slice(0, 8) || [], [data]);
   const creatorCampaigns = useMemo(() => data?.campaigns?.slice(0, 6) || [], [data]);
+  const activity = useMemo(() => {
+    const notificationItems = notifications.map((item) => ({
+      id: `notification-${item._id}`,
+      kind: 'notification',
+      title: item.title,
+      message: item.message,
+      dateValue: item.createdAt,
+      readAt: item.readAt,
+      campaign: item.campaign,
+    }));
+    const paymentItems = (data?.payments || []).map((payment) => ({
+      id: `payment-${payment._id}`,
+      kind: 'payment',
+      title: payment.status === 'paid' ? 'Contribution successful' : payment.status === 'failed' ? 'Payment failed' : 'Payment in progress',
+      message: `${money(payment.amount)} · ${payment.campaign?.title || 'Campaign'} · ${payment.status}`,
+      dateValue: payment.paidAt || payment.updatedAt || payment.createdAt,
+      status: payment.status,
+      campaign: payment.campaign,
+    }));
+    return [...notificationItems, ...paymentItems].sort((a, b) => new Date(b.dateValue || 0) - new Date(a.dateValue || 0)).slice(0, 8);
+  }, [data, notifications]);
 
   const markAllRead = async () => {
     try {
@@ -70,7 +91,7 @@ export default function DashboardPage() {
         <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           <Stat label="Campaigns" value={data.creator.campaigns} hint="Created by you" />
           <Stat label="Raised" value={money(data.creator.raised)} hint={`${creatorProgress}% of combined goals`} />
-          <Stat label="Contributed" value={money(data.backer.total)} hint={`${data.backer.contributions} successful · {data.backer.pending} pending · {data.backer.failed} failed payments`} />
+          <Stat label="Contributed" value={money(data.backer.total)} hint={`${data.backer.contributions} successful · ${data.backer.pending} pending · ${data.backer.failed} failed payments`} />
           <Stat label="Backers" value={data.creator.backers} hint={`${data.creator.active} active · ${data.creator.funded} funded`} />
         </section>
 
@@ -93,10 +114,25 @@ export default function DashboardPage() {
           </div>
 
           <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
-            <div className="flex items-center justify-between"><div><p className="text-xs font-bold uppercase tracking-[0.14em] text-emerald-600">Activity</p><h2 className="mt-1 text-2xl font-black text-slate-950">Notifications</h2></div>{unread > 0 && <button onClick={markAllRead} className="text-xs font-bold text-emerald-600">Mark all read</button>}</div>
+            <div className="flex items-center justify-between"><div><p className="text-xs font-bold uppercase tracking-[0.14em] text-emerald-600">Activity</p><h2 className="mt-1 text-2xl font-black text-slate-950">Recent activity</h2></div>{unread > 0 && <button onClick={markAllRead} className="text-xs font-bold text-emerald-600">Mark all read</button>}</div>
             <div className="mt-5 space-y-3">
-              {notifications.slice(0, 6).length ? notifications.slice(0, 6).map(n => <div key={n._id} className={`rounded-2xl p-4 ${n.readAt ? 'bg-slate-50' : 'bg-emerald-50'}`}><div className="flex items-start gap-3"><span className="mt-1 h-2.5 w-2.5 shrink-0 rounded-full bg-emerald-500" /><div><p className="text-sm font-extrabold text-slate-900">{n.title}</p><p className="mt-1 text-xs leading-5 text-slate-500">{n.message}</p><p className="mt-2 text-[10px] font-bold uppercase tracking-wider text-slate-400">{date(n.createdAt)}</p></div></div></div>) : <p className="rounded-2xl bg-slate-50 p-6 text-center text-sm text-slate-500">No notifications yet.</p>}
-            </div>
+              {activity.length ? activity.map(item => (
+                <div key={item.id} className={`rounded-2xl border p-4 ${item.kind === 'notification' && !item.readAt ? 'border-emerald-200 bg-emerald-50' : 'border-slate-100 bg-slate-50'}`}>
+                  <div className="flex items-start gap-3">
+                    <span className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-xl text-xs font-black ${item.kind === 'payment' ? 'bg-slate-900 text-emerald-300' : 'bg-emerald-100 text-emerald-700'}`}>{item.kind === 'payment' ? '₹' : '•'}</span>
+                    <div className="min-w-0 flex-1">
+                      <p className="text-sm font-extrabold text-slate-900">{item.title}</p>
+                      <p className="mt-1 text-xs leading-5 text-slate-500">{item.message}</p>
+                      <div className="mt-2 flex flex-wrap items-center gap-2 text-[10px] font-bold uppercase tracking-wider text-slate-400">
+                        <span>{date(item.dateValue)}</span>
+                        {item.status && <span className="rounded-full bg-white px-2 py-1">{item.status}</span>}
+                        {item.campaign?._id && <Link to={`/campaign/${item.campaign._id}`} className="text-emerald-600 hover:underline">View campaign</Link>}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )) : <p className="rounded-2xl bg-slate-50 p-6 text-center text-sm text-slate-500">No activity yet.</p>}
+            </div></div>
           </div>
         </section>
 
@@ -133,7 +169,7 @@ export default function DashboardPage() {
 
         <section className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
           <div className="flex items-center justify-between"><div><p className="text-xs font-bold uppercase tracking-[0.14em] text-emerald-600">Backer side</p><h2 className="mt-1 text-2xl font-black text-slate-950">Payment history</h2></div><span className="rounded-full bg-emerald-50 px-3 py-1.5 text-xs font-black text-emerald-700">{data.backer.contributions} successful</span></div>
-          <div className="mt-5 overflow-x-auto"><table className="min-w-full text-left"><thead><tr className="border-b border-slate-200 text-xs uppercase tracking-wider text-slate-400"><th className="px-3 py-3">Campaign</th><th className="px-3 py-3">Reward</th><th className="px-3 py-3">Amount</th><th className="px-3 py-3">Date</th><th className="px-3 py-3">Status</th></tr></thead><tbody>{recentPayments.length ? recentPayments.map(p => <tr key={p._id} className="border-b border-slate-100 text-sm"><td className="px-3 py-4 font-bold text-slate-800">{p.campaign?.title || 'Campaign'}</td><td className="px-3 py-4 text-slate-500">{p.reward?.title || 'Reward'}</td><td className="px-3 py-4 font-black text-slate-900">{money(p.amount)}</td><td className="px-3 py-4 text-slate-500">{date(p.paidAt)}</td><td className="px-3 py-4"><span className={`rounded-full px-2.5 py-1 text-xs font-bold ${p.status === 'paid' ? 'bg-emerald-50 text-emerald-700' : p.status === 'failed' ? 'bg-rose-50 text-rose-700' : 'bg-amber-50 text-amber-700'}`}>{p.status}</span></td></tr>) : <tr><td colSpan="5" className="px-3 py-10 text-center text-sm text-slate-500">No successful payments yet.</td></tr>}</tbody></table></div>
+          <div className="mt-5 overflow-x-auto"><table className="min-w-full text-left"><thead><tr className="border-b border-slate-200 text-xs uppercase tracking-wider text-slate-400"><th className="px-3 py-3">Campaign</th><th className="px-3 py-3">Reward</th><th className="px-3 py-3">Amount</th><th className="px-3 py-3">Date</th><th className="px-3 py-3">Status</th></tr></thead><tbody>{recentPayments.length ? recentPayments.map(p => <tr key={p._id} className="border-b border-slate-100 text-sm"><td className="px-3 py-4 font-bold text-slate-800">{p.campaign?.title || 'Campaign'}</td><td className="px-3 py-4 text-slate-500">{p.reward?.title || 'Reward'}</td><td className="px-3 py-4 font-black text-slate-900">{money(p.amount)}</td><td className="px-3 py-4 text-slate-500">{date(p.paidAt || p.updatedAt || p.createdAt)}</td><td className="px-3 py-4"><span className={`rounded-full px-2.5 py-1 text-xs font-bold ${p.status === 'paid' ? 'bg-emerald-50 text-emerald-700' : p.status === 'failed' ? 'bg-rose-50 text-rose-700' : 'bg-amber-50 text-amber-700'}`}>{p.status}</span></td></tr>) : <tr><td colSpan="5" className="px-3 py-10 text-center text-sm text-slate-500">No payment activity yet.</td></tr>}</tbody></table></div>
         </section>
       </main>
     </div>
