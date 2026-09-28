@@ -8,7 +8,7 @@ const paymentSchema = new mongoose.Schema({
   currency: { type: String, default: 'INR', uppercase: true, trim: true },
   status: { type: String, enum: ['created', 'processing', 'paid', 'failed'], default: 'created', index: true },
   razorpayOrderId: { type: String, required: true, unique: true, index: true },
-  razorpayPaymentId: { type: String, default: null, unique: true, sparse: true, index: true },
+  razorpayPaymentId: { type: String, default: undefined, unique: true, sparse: true, index: true },
   razorpaySignature: { type: String, default: null },
   failureReason: { type: String, default: '' },
   paidAt: { type: Date, default: null },
