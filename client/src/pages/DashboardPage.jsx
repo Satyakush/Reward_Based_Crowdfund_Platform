@@ -71,7 +71,7 @@ export default function DashboardPage() {
           <Stat label="Campaigns" value={data.creator.campaigns} hint="Created by you" />
           <Stat label="Raised" value={money(data.creator.raised)} hint={`${creatorProgress}% of combined goals`} />
           <Stat label="Contributed" value={money(data.backer.total)} hint={`${data.backer.contributions} successful payments`} />
-          <Stat label="Backers" value={data.creator.backers} hint="Across your campaigns" />
+          <Stat label="Backers" value={data.creator.backers} hint={`${data.creator.active} active · ${data.creator.funded} funded`} />
         </section>
 
         <section className="grid gap-6 lg:grid-cols-[1.25fr_0.75fr]">
@@ -96,6 +96,37 @@ export default function DashboardPage() {
             <div className="flex items-center justify-between"><div><p className="text-xs font-bold uppercase tracking-[0.14em] text-emerald-600">Activity</p><h2 className="mt-1 text-2xl font-black text-slate-950">Notifications</h2></div>{unread > 0 && <button onClick={markAllRead} className="text-xs font-bold text-emerald-600">Mark all read</button>}</div>
             <div className="mt-5 space-y-3">
               {notifications.slice(0, 6).length ? notifications.slice(0, 6).map(n => <div key={n._id} className={`rounded-2xl p-4 ${n.readAt ? 'bg-slate-50' : 'bg-emerald-50'}`}><div className="flex items-start gap-3"><span className="mt-1 h-2.5 w-2.5 shrink-0 rounded-full bg-emerald-500" /><div><p className="text-sm font-extrabold text-slate-900">{n.title}</p><p className="mt-1 text-xs leading-5 text-slate-500">{n.message}</p><p className="mt-2 text-[10px] font-bold uppercase tracking-wider text-slate-400">{date(n.createdAt)}</p></div></div></div>) : <p className="rounded-2xl bg-slate-50 p-6 text-center text-sm text-slate-500">No notifications yet.</p>}
+            </div>
+          </div>
+        </section>
+
+        <section className="grid gap-6 lg:grid-cols-2">
+          <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
+            <p className="text-xs font-bold uppercase tracking-[0.14em] text-emerald-600">Creator analytics</p>
+            <h2 className="mt-1 text-2xl font-black text-slate-950">Campaign performance</h2>
+            <div className="mt-5 space-y-3">
+              {(data.analytics?.campaignPerformance || []).map(c => (
+                <div key={c._id} className="rounded-2xl bg-slate-50 p-4">
+                  <div className="flex items-center justify-between gap-3"><span className="font-extrabold text-slate-800">{c.title}</span><span className="text-xs font-black uppercase text-emerald-600">{c.status}</span></div>
+                  <div className="mt-3 h-2 rounded-full bg-slate-200"><div className="h-full rounded-full bg-emerald-500" style={{width: `${c.fundingPercent}%`}} /></div>
+                  <div className="mt-2 flex justify-between text-xs font-semibold text-slate-500"><span>₹{Number(c.amountRaised).toLocaleString('en-IN')} raised</span><span>{c.backers} backers</span><span>{c.fundingPercent}%</span></div>
+                </div>
+              ))}
+              {!data.analytics?.campaignPerformance?.length && <p className="rounded-2xl bg-slate-50 p-6 text-center text-sm text-slate-500">Create a campaign to see analytics.</p>}
+            </div>
+          </div>
+          <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
+            <p className="text-xs font-bold uppercase tracking-[0.14em] text-emerald-600">Reward analytics</p>
+            <h2 className="mt-1 text-2xl font-black text-slate-950">Top reward tiers</h2>
+            <p className="mt-2 text-sm text-slate-500">Average successful contribution: ₹{Number(data.analytics?.averageContribution || 0).toLocaleString('en-IN')}</p>
+            <div className="mt-5 space-y-3">
+              {(data.analytics?.rewardPerformance || []).slice(0, 5).map(r => (
+                <div key={r.title} className="flex items-center justify-between rounded-2xl bg-slate-50 p-4">
+                  <div><p className="font-bold text-slate-800">{r.title}</p><p className="text-xs text-slate-400">{r.contributions} contribution{r.contributions === 1 ? '' : 's'}</p></div>
+                  <span className="font-black text-slate-900">₹{Number(r.raised).toLocaleString('en-IN')}</span>
+                </div>
+              ))}
+              {!data.analytics?.rewardPerformance?.length && <p className="rounded-2xl bg-slate-50 p-6 text-center text-sm text-slate-500">Successful contributions will appear here.</p>}
             </div>
           </div>
         </section>
