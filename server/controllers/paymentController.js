@@ -18,6 +18,7 @@ const createPaymentOrder = async (req, res) => {
     if (campaign.creator.toString() === req.user._id.toString()) {
       return res.status(400).json({ message: 'You cannot back your own campaign.' });
     }
+    if (Number(campaign.amountRaised || 0) >= Number(campaign.goalAmount || 0)) return res.status(400).json({ message: 'This campaign is already fully funded.' });
     if (new Date(campaign.endDate).getTime() <= Date.now()) return res.status(400).json({ message: 'This campaign has ended.' });
 
     const remaining = Number(campaign.goalAmount) - Number(campaign.amountRaised || 0);
