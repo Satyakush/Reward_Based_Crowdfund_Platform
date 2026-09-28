@@ -147,6 +147,7 @@ const deleteCampaign = async (req, res, next) => {
     const campaign = await Campaign.findById(req.params.id);
     if (!campaign) return res.status(404).json({ message: 'Campaign not found.' });
     if (campaign.creator.toString() !== req.user._id.toString()) return res.status(403).json({ message: 'You can only delete your own campaigns.' });
+    if (getCampaignStatus(campaign) !== 'active') return res.status(400).json({ message: 'Only active campaigns can be deleted.' });
 
     if (campaign.imageUrl?.includes('res.cloudinary.com/')) {
       const match = campaign.imageUrl.match(/\/upload\/(?:v\d+\/)?(.+)$/);
