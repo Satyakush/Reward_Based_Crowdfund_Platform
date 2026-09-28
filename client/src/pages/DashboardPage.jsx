@@ -5,6 +5,7 @@ import { toast } from 'react-toastify';
 
 const money = (value = 0) => `₹${Number(value).toLocaleString('en-IN')}`;
 const date = (value) => value ? new Date(value).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : '—';
+const statusLabel = (status) => ({ paid: 'Paid', processing: 'Processing', created: 'Awaiting payment', failed: 'Failed' }[status] || status || 'Unknown');
 
 const Stat = ({ label, value, hint }) => (
   <div className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm">
@@ -34,7 +35,11 @@ export default function DashboardPage() {
     } finally { setLoading(false); }
   };
 
-  useEffect(() => { load(); }, []);
+  useEffect(() => {
+    load();
+    const interval = setInterval(load, 30000);
+    return () => clearInterval(interval);
+  }, []);
 
   const recentPayments = useMemo(() => data?.payments?.slice(0, 8) || [], [data]);
   const creatorCampaigns = useMemo(() => data?.campaigns?.slice(0, 6) || [], [data]);
@@ -51,8 +56,8 @@ export default function DashboardPage() {
     const paymentItems = (data?.payments || []).map((payment) => ({
       id: `payment-${payment._id}`,
       kind: 'payment',
-      title: payment.status === 'paid' ? 'Contribution successful' : payment.status === 'failed' ? 'Payment failed' : 'Payment in progress',
-      message: `${money(payment.amount)} · ${payment.campaign?.title || 'Campaign'} · ${payment.status}`,
+      title: payment.status === 'paid' ? 'Contribution successful' : payment.status === 'failed' ? 'Payment failed' : payment.status === 'processing' ? 'Payment processing' : 'Payment awaiting confirmation',
+      message: `${money(payment.amount)} · ${payment.campaign?.title || 'Campaign'} · ${statusLabel(payment.status)}`,
       dateValue: payment.paidAt || payment.updatedAt || payment.createdAt,
       status: payment.status,
       campaign: payment.campaign,
@@ -125,7 +130,7 @@ export default function DashboardPage() {
                       <p className="mt-1 text-xs leading-5 text-slate-500">{item.message}</p>
                       <div className="mt-2 flex flex-wrap items-center gap-2 text-[10px] font-bold uppercase tracking-wider text-slate-400">
                         <span>{date(item.dateValue)}</span>
-                        {item.status && <span className="rounded-full bg-white px-2 py-1">{item.status}</span>}
+                        {item.status && <span className="rounded-full bg-white px-2 py-1">{statusLabel(item.status)}</span>}
                         {item.campaign?._id && <Link to={`/campaign/${item.campaign._id}`} className="text-emerald-600 hover:underline">View campaign</Link>}
                       </div>
                     </div>
@@ -169,7 +174,7 @@ export default function DashboardPage() {
 
         <section className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
           <div className="flex items-center justify-between"><div><p className="text-xs font-bold uppercase tracking-[0.14em] text-emerald-600">Backer side</p><h2 className="mt-1 text-2xl font-black text-slate-950">Payment history</h2></div><span className="rounded-full bg-emerald-50 px-3 py-1.5 text-xs font-black text-emerald-700">{data.backer.contributions} successful</span></div>
-          <div className="mt-5 overflow-x-auto"><table className="min-w-full text-left"><thead><tr className="border-b border-slate-200 text-xs uppercase tracking-wider text-slate-400"><th className="px-3 py-3">Campaign</th><th className="px-3 py-3">Reward</th><th className="px-3 py-3">Amount</th><th className="px-3 py-3">Date</th><th className="px-3 py-3">Status</th></tr></thead><tbody>{recentPayments.length ? recentPayments.map(p => <tr key={p._id} className="border-b border-slate-100 text-sm"><td className="px-3 py-4 font-bold text-slate-800">{p.campaign?.title || 'Campaign'}</td><td className="px-3 py-4 text-slate-500">{p.reward?.title || 'Reward'}</td><td className="px-3 py-4 font-black text-slate-900">{money(p.amount)}</td><td className="px-3 py-4 text-slate-500">{date(p.paidAt || p.updatedAt || p.createdAt)}</td><td className="px-3 py-4"><span className={`rounded-full px-2.5 py-1 text-xs font-bold ${p.status === 'paid' ? 'bg-emerald-50 text-emerald-700' : p.status === 'failed' ? 'bg-rose-50 text-rose-700' : 'bg-amber-50 text-amber-700'}`}>{p.status}</span></td></tr>) : <tr><td colSpan="5" className="px-3 py-10 text-center text-sm text-slate-500">No payment activity yet.</td></tr>}</tbody></table></div>
+          <div className="mt-5 overflow-x-auto"><table className="min-w-full text-left"><thead><tr className="border-b border-slate-200 text-xs uppercase tracking-wider text-slate-400"><th className="px-3 py-3">Campaign</th><th className="px-3 py-3">Reward</th><th className="px-3 py-3">Amount</th><th className="px-3 py-3">Date</th><th className="px-3 py-3">Transaction</th><th className="px-3 py-3">Status</th></tr></thead><tbody>{recentPayments.length ? recentPayments.map(p => <tr key={p._id} className="border-b border-slate-100 text-sm"><td className="px-3 py-4 font-bold text-slate-800">{p.campaign?.title || 'Campaign'}</td><td className="px-3 py-4 text-slate-500">{p.reward?.title || 'Reward'}</td><td className="px-3 py-4 font-black text-slate-900">{money(p.amount)}</td><td className="px-3 py-4 text-slate-500">{date(p.paidAt || p.updatedAt || p.createdAt)}</td><td className="px-3 py-4 font-mono text-xs text-slate-400">{p.razorpayPaymentId ? `${p.razorpayPaymentId.slice(0, 12)}…` : "—"}</td><td className="px-3 py-4"><span className={`rounded-full px-2.5 py-1 text-xs font-bold ${p.status === 'paid' ? 'bg-emerald-50 text-emerald-700' : p.status === 'failed' ? 'bg-rose-50 text-rose-700' : 'bg-amber-50 text-amber-700'}`}>{statusLabel(p.status)}</span></td></tr>) : <tr><td colSpan="6" className="px-3 py-10 text-center text-sm text-slate-500">No payment activity yet.</td></tr>}</tbody></table></div>
         </section>
       </main>
     </div>
