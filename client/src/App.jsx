@@ -9,6 +9,7 @@ import CampaignDetailsPage from './pages/CampaignDetailsPage';
 import MyCampaignsPage from './pages/MyCampaignsPage';
 import EditCampaignPage from './pages/EditCampaignPage';
 import DashboardPage from './pages/DashboardPage';
+import AdminPage from './pages/AdminPage';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
@@ -28,6 +29,7 @@ function App() {
 
           <Route element={<ProtectedRoute />}>
             <Route path="/dashboard" element={<DashboardPage />} />
+            <Route path="/admin" element={<AdminPage />} />
             <Route path="/create-campaign" element={<CreateCampaignPage />} />
             <Route path="/my-campaigns" element={<MyCampaignsPage />} />
             <Route path="/edit-campaign/:id" element={<EditCampaignPage />} />
