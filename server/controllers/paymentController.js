@@ -82,7 +82,7 @@ const verifyPayment = async (req, res) => {
       return res.status(400).json({ message: 'Payment could not be confirmed as captured.' });
     }
 
-    const updated = await finalizePayment(paymentRecord._id, payment.id, razorpaySignature, Number(payment.amount) / 100);
+    const updated = await finalizePayment(paymentRecord._id, payment.id, razorpaySignature, Number(payment.amount) / 100, payment.method || '');
     if (!updated) return res.status(409).json({ message: 'Payment was already processed or campaign funding changed.' });
 
     res.json({ message: 'Payment completed successfully.', payment: updated });
@@ -92,7 +92,7 @@ const verifyPayment = async (req, res) => {
   }
 };
 
-const finalizePayment = async (paymentId, razorpayPaymentId, signature = null, capturedAmount) => {
+const finalizePayment = async (paymentId, razorpayPaymentId, signature = null, capturedAmount, paymentMethod = '') => {
   const paymentRecord = await Payment.findOneAndUpdate({ _id: paymentId, status: 'created' }, { $set: { status: 'processing' } }, { new: true });
   if (!paymentRecord) return null;
   if (capturedAmount !== Number(paymentRecord.amount)) {
@@ -113,6 +113,7 @@ const finalizePayment = async (paymentId, razorpayPaymentId, signature = null, c
   paymentRecord.status = 'paid';
   paymentRecord.razorpayPaymentId = razorpayPaymentId;
   paymentRecord.razorpaySignature = signature;
+  paymentRecord.paymentMethod = paymentMethod || paymentRecord.paymentMethod;
   paymentRecord.paidAt = new Date();
   await paymentRecord.save();
 
