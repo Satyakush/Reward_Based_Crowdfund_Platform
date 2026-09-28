@@ -18,9 +18,8 @@ const getProgress = (campaign) => {
 };
 
 const getStatus = (campaign) => {
-  const endDate = campaign?.endDate ? new Date(campaign.endDate) : null;
-  if (endDate && endDate.getTime() < Date.now()) return 'Ended';
-  if (getProgress(campaign) >= 100) return 'Funded';
+  if (campaign?.status === 'funded') return 'Funded';
+  if (campaign?.status === 'ended') return 'Ended';
   return 'Active';
 };
 
@@ -141,7 +140,7 @@ const MyCampaignsPage = () => {
             >
               <div className="flex items-center gap-4">
                 <StatIcon>
-                  <span className="text-sm font-black">{stat.icon === 'dollar' ? '$' : stat.icon === 'target' ? '◎' : stat.icon === 'trend' ? '↗' : '▦'}</span>
+                  <span className="text-sm font-black">{stat.icon === 'dollar' ? '₹' : stat.icon === 'target' ? '◎' : stat.icon === 'trend' ? '↗' : '▦'}</span>
                 </StatIcon>
                 <div className="min-w-0">
                   <p className="truncate text-xs font-semibold uppercase tracking-wider text-slate-400">{stat.label}</p>
