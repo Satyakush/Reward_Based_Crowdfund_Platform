@@ -35,7 +35,7 @@ const handleRazorpayWebhook = async (req, res) => {
     if (event.event === 'payment.captured' && entity?.order_id) {
       const paymentRecord = await Payment.findOne({ razorpayOrderId: entity.order_id });
       if (paymentRecord && paymentRecord.status !== 'paid') {
-        await finalizePayment(paymentRecord._id, entity.id, null, Number(entity.amount) / 100);
+        await finalizePayment(paymentRecord._id, entity.id, null, Number(entity.amount) / 100, entity.method || '');
       }
     }
 
