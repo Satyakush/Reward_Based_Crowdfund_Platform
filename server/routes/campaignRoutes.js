@@ -6,7 +6,6 @@ const {
     createCampaign, 
     getCampaigns, 
     getCampaignById, 
-    pledgeToCampaign,
     deleteCampaign,
     updateCampaign,
     getMyCampaigns
@@ -24,6 +23,5 @@ router.route('/:id')
     .delete(protect, deleteCampaign)
     .put(protect, upload.single('image'), updateCampaign);
 
-router.route('/:id/pledge').post(protect, pledgeToCampaign);
 
 module.exports = router;
