@@ -2,6 +2,7 @@ const crypto = require('crypto');
 const Campaign = require('../models/Campaign');
 const Payment = require('../models/Payment');
 const Notification = require('../models/Notification');
+const User = require('../models/User');
 const getRazorpay = require('../config/razorpay');
 
 const MAX_PAYMENT_AMOUNT = 1000000;
@@ -115,14 +116,27 @@ const finalizePayment = async (paymentId, razorpayPaymentId, signature = null, c
   paymentRecord.paidAt = new Date();
   await paymentRecord.save();
 
-  // Notifications are secondary side effects; a notification failure must not
-  // turn an already-confirmed payment into a false frontend error.
+  // Notify both sides of the contribution. The creator receives a
+  // contribution-specific notification for every successful payment.
+  const contributor = await User.findById(paymentRecord.backer).select('name email');
+  const contributorName = contributor?.name || contributor?.email || 'A supporter';
+  const reward = campaign.rewards.id(paymentRecord.reward);
+  const rewardTitle = reward?.title || 'selected reward';
+
   const notificationJobs = [
     Notification.create({
       user: paymentRecord.backer,
       type: 'payment_success',
       title: 'Payment successful',
-      message: `Your contribution to “${campaign.title}” was confirmed.`,
+      message: `Your contribution of ₹${capturedAmount.toLocaleString('en-IN')} to “${campaign.title}” was confirmed.`,
+      campaign: campaign._id,
+      payment: paymentRecord._id,
+    }),
+    Notification.create({
+      user: campaign.creator,
+      type: 'contribution_received',
+      title: 'New contribution received',
+      message: `${contributorName} contributed ₹${capturedAmount.toLocaleString('en-IN')} to “${campaign.title}” and selected “${rewardTitle}”.`,
       campaign: campaign._id,
       payment: paymentRecord._id,
     }),
