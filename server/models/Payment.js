@@ -10,6 +10,8 @@ const paymentSchema = new mongoose.Schema({
   razorpayOrderId: { type: String, required: true, unique: true, index: true },
   razorpayPaymentId: { type: String, default: undefined, unique: true, sparse: true, index: true },
   razorpaySignature: { type: String, default: null },
+  paymentMethod: { type: String, default: '', trim: true },
+  bankReference: { type: String, default: '', trim: true },
   failureReason: { type: String, default: '' },
   paidAt: { type: Date, default: null },
 }, { timestamps: true });
