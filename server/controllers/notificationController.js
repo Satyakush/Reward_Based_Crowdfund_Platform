@@ -1,7 +1,21 @@
 const Notification = require('../models/Notification');
+const Campaign = require('../models/Campaign');
 
 const getNotifications = async (req, res, next) => {
   try {
+    const ended = await Campaign.find({ creator: req.user._id, endDate: { $lte: new Date() } }).select('_id title');
+    if (ended.length) {
+      const existing = await Notification.find({ user: req.user._id, type: 'campaign_ended', campaign: { $in: ended.map(c => c._id) } }).select('campaign');
+      const seen = new Set(existing.map(item => String(item.campaign)));
+      const missing = ended.filter(c => !seen.has(String(c._id)));
+      if (missing.length) {
+        await Notification.insertMany(missing.map(c => ({
+          user: req.user._id, type: 'campaign_ended', title: 'Campaign ended',
+          message: `“${c.title}” has reached its end date.`, campaign: c._id
+        })), { ordered: false });
+      }
+    }
+
     const notifications = await Notification.find({ user: req.user._id })
       .populate('campaign', '_id title')
       .sort({ createdAt: -1 })
