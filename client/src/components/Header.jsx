@@ -40,7 +40,7 @@ const NotificationBell = () => {
   return (
     <div className="relative" ref={ref}>
       <button onClick={() => setOpen(v => !v)} className="relative flex h-10 w-10 items-center justify-center rounded-xl text-slate-300 transition hover:bg-white/10 hover:text-white" aria-label="Notifications">
-        <span className="text-lg">♢</span>
+        <svg aria-hidden="true" viewBox="0 0 24 24" className="h-5 w-5 fill-none stroke-current stroke-2"><path strokeLinecap="round" strokeLinejoin="round" d="M15 17H9m9-2V11a6 6 0 10-12 0v4l-2 2h16l-2-2zm-3 2a3 3 0 01-6 0" /></svg>
         {unread > 0 && <span className="absolute right-1 top-1 flex min-w-4 h-4 items-center justify-center rounded-full bg-emerald-400 px-1 text-[9px] font-black text-slate-950">{unread > 9 ? '9+' : unread}</span>}
       </button>
       {open && (
@@ -51,9 +51,19 @@ const NotificationBell = () => {
           </div>
           <div className="max-h-96 overflow-y-auto">
             {items.length ? items.slice(0, 8).map(n => (
-              <button key={n._id} onClick={() => markRead(n._id)} className={`block w-full border-b border-slate-100 px-4 py-3 text-left hover:bg-slate-50 ${n.readAt ? '' : 'bg-emerald-50/60'}`}>
-                <div className="flex gap-3"><span className="mt-1 h-2 w-2 shrink-0 rounded-full bg-emerald-500" /><div><p className="text-xs font-extrabold">{n.title}</p><p className="mt-1 text-xs leading-5 text-slate-500">{n.message}</p></div></div>
-              </button>
+              <div key={n._id} className={`border-b border-slate-100 px-4 py-3 hover:bg-slate-50 ${n.readAt ? '' : 'bg-emerald-50/60'}`}>
+                <div className="flex gap-3">
+                  <button onClick={() => markRead(n._id)} className="mt-1 h-2 w-2 shrink-0 rounded-full bg-emerald-500" aria-label="Mark notification as read" />
+                  <div className="min-w-0 flex-1">
+                    <p className="text-xs font-extrabold">{n.title}</p>
+                    <p className="mt-1 text-xs leading-5 text-slate-500">{n.message}</p>
+                    <div className="mt-2 flex items-center gap-3">
+                      {n.campaign?._id && <Link to={`/campaign/${n.campaign._id}`} onClick={() => { markRead(n._id); setOpen(false); }} className="text-[10px] font-black uppercase tracking-wider text-emerald-600">View campaign</Link>}
+                      {!n.readAt && <button onClick={() => markRead(n._id)} className="text-[10px] font-black uppercase tracking-wider text-slate-400">Mark read</button>}
+                    </div>
+                  </div>
+                </div>
+              </div>
             )) : <p className="px-4 py-8 text-center text-sm text-slate-500">You're all caught up.</p>}
           </div>
           <Link to="/dashboard" onClick={() => setOpen(false)} className="block border-t border-slate-100 px-4 py-3 text-center text-xs font-black text-emerald-600">Open activity dashboard →</Link>
