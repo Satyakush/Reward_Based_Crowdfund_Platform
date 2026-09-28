@@ -23,7 +23,7 @@ The platform provides a complete campaign workflow:
 
 **Register → Authenticate → Create Campaign → Manage Campaign → Receive Pledges**
 
-Creators can manage campaigns they own, while users can explore campaigns and participate through pledges.
+Creators can manage campaigns they own, while users can explore campaigns, select reward tiers, and contribute through Razorpay.
 
 ---
 
@@ -34,7 +34,11 @@ Creators can manage campaigns they own, while users can explore campaigns and pa
 - JWT-based authentication
 - Campaign discovery
 - Campaign detail pages
-- Pledge/support workflow
+- Reward-based Razorpay payment workflow
+- Payment verification and webhook reconciliation
+- Backer payment history and contribution analytics
+- Creator campaign and reward analytics
+- Notification center with unread tracking
 - Responsive React interface
 
 ### 🎯 Campaign Management
@@ -82,7 +86,8 @@ JWT protects authenticated operations, while backend ownership checks ensure tha
 
 - JWT authentication
 - Protected API routes
-- Campaign ownership validation
+- Campaign ownership and lifecycle validation
+- Active / funded / ended campaign states
 - Environment-based secrets
 - Backend-enforced authorization
 - No real credentials committed to Git
@@ -99,6 +104,8 @@ JWT protects authenticated operations, while backend ownership checks ensure tha
 | Database | MongoDB, Mongoose |
 | Authentication | JWT |
 | Image Storage | Cloudinary |
+| Payments | Razorpay |
+| Security | Helmet, CORS allowlist, API rate limiting |
 | API Style | REST |
 
 ---
@@ -143,14 +150,30 @@ Create server/.env locally:
 PORT=5001
 MONGO_URI=your_mongodb_connection_string
 JWT_SECRET=your_jwt_secret
+CLIENT_URLS=http://localhost:5173
+ADMIN_EMAILS=your-admin-email@example.com
 CLOUDINARY_CLOUD_NAME=your_cloud_name
 CLOUDINARY_API_KEY=your_api_key
 CLOUDINARY_API_SECRET=your_api_secret
+RAZORPAY_KEY_ID=your_razorpay_key_id
+RAZORPAY_KEY_SECRET=your_razorpay_key_secret
+RAZORPAY_WEBHOOK_SECRET=your_webhook_secret
 ~~~
 
 **Never commit real credentials.**
 
 ---
+
+## 🚀 Production Checklist
+
+1. Copy `server/.env.example` to `server/.env` and set production values.
+2. Set `CLIENT_URLS` to the deployed frontend origin(s).
+3. Set `VITE_API_URL` in the frontend to the deployed backend origin.
+4. Configure the Razorpay webhook endpoint as `<API_URL>/api/payment-webhooks/razorpay` and use the same webhook secret in `RAZORPAY_WEBHOOK_SECRET`.
+5. Use Razorpay test keys for staging and live keys only for the production environment.
+6. Deploy the backend and verify `GET /api/health` before opening the frontend.
+7. Run a smoke test: register/login → create campaign → edit → back with Razorpay → verify payment → dashboard → notification bell.
+8. Configure `ADMIN_EMAILS` only for trusted administrator accounts.
 
 ## 🔎 Engineering Highlights
 
@@ -164,14 +187,16 @@ CLOUDINARY_API_SECRET=your_api_secret
 
 ---
 
-## 🚀 Future Improvements
+## 🧪 Pre-Deployment Verification
 
-- Campaign search and filtering
-- Payment gateway integration
-- Campaign progress analytics
-- Automated testing
-- Pagination
-- Centralized validation and error handling
+- `npm run build` succeeds in `client/`.
+- Backend starts with `npm start` and connects to MongoDB.
+- Razorpay test payment completes and appears in dashboard history.
+- Razorpay webhook receives and verifies signed events.
+- Ended and fully funded campaigns cannot accept new payments.
+- Protected endpoints reject missing or invalid JWTs.
+- CORS allows only configured frontend origins.
+- No real `.env` credentials are committed.
 
 ---
 
