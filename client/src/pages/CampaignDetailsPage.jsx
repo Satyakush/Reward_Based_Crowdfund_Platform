@@ -5,6 +5,8 @@ import { AuthContext } from '../context/AuthContext.jsx';
 import { toast } from 'react-toastify';
 import { motion } from 'framer-motion';
 
+const campaignFallbackImage = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 700"%3E%3Crect width="1200" height="700" fill="%230f172a"/%3E%3Ccircle cx="220" cy="140" r="260" fill="%2310b981" fill-opacity=".25"/%3E%3Ccircle cx="980" cy="580" r="320" fill="%2338bdf8" fill-opacity=".16"/%3E%3Ctext x="600" y="365" fill="%23d1fae5" font-family="Arial" font-size="48" font-weight="700" text-anchor="middle"%3ECampaign cover%3C/text%3E%3C/svg%3E';
+
 const formatCurrency = (value = 0) => `₹${Number(value).toLocaleString('en-IN')}`;
 
 const CampaignDetailsPage = () => {
@@ -177,7 +179,7 @@ const CampaignDetailsPage = () => {
               className="overflow-hidden rounded-[2rem] border border-slate-200 bg-white shadow-sm"
             >
               <div className="relative">
-                <img src={campaign.imageUrl} alt={campaign.title} className="h-[360px] w-full object-cover sm:h-[500px]" />
+                <img src={campaign.imageUrl || campaignFallbackImage} alt={campaign.title} onError={(event) => { event.currentTarget.onerror = null; event.currentTarget.src = campaignFallbackImage; }} decoding="async" className="h-[360px] w-full object-cover sm:h-[500px]" />
                 <div className="absolute inset-0 bg-gradient-to-t from-slate-950/65 via-transparent to-transparent" />
                 <div className="absolute bottom-5 left-5 right-5 sm:bottom-7 sm:left-7">
                   <span className={`inline-flex rounded-full px-3 py-1.5 text-xs font-black backdrop-blur ${campaignStats.percentage >= 100 ? 'bg-emerald-400 text-slate-950' : campaignStats.ended ? 'bg-white/85 text-slate-700' : 'bg-slate-950/75 text-white'}`}>
