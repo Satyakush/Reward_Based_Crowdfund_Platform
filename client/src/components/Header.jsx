@@ -76,6 +76,7 @@ const NotificationBell = () => {
 const Header = () => {
   const { user, logout } = useContext(AuthContext);
   const navigate = useNavigate();
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   const handleLogout = () => { logout(); navigate('/login'); };
 
@@ -86,7 +87,7 @@ const Header = () => {
           <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-400 text-lg font-black text-slate-950 shadow-lg shadow-emerald-500/20 transition group-hover:rotate-3">C</span>
           <div><p className="text-lg font-black tracking-tight">CrowdFund</p><p className="hidden text-[10px] font-semibold uppercase tracking-[0.2em] text-slate-400 sm:block">Ideas worth backing</p></div>
         </Link>
-        <nav className="flex items-center gap-1 sm:gap-3">
+        <nav className="hidden items-center gap-1 sm:flex sm:gap-3">
           <Link to="/" className="rounded-xl px-2.5 py-2 text-sm font-semibold text-slate-300 transition hover:bg-white/5 hover:text-white sm:px-3">Campaigns</Link>
           {user ? <>
             <NotificationBell />
@@ -98,7 +99,19 @@ const Header = () => {
             <Link to="/register" className="rounded-xl bg-emerald-400 px-4 py-2.5 text-sm font-bold text-slate-950 transition hover:bg-emerald-300">Register</Link>
           </>}
         </nav>
+        <button type="button" aria-label={isMenuOpen ? "Close navigation" : "Open navigation"} aria-expanded={isMenuOpen} onClick={() => setIsMenuOpen(v => !v)} className="flex h-10 w-10 items-center justify-center rounded-xl border border-white/10 text-slate-200 sm:hidden">{isMenuOpen ? "×" : "☰"}</button>
       </div>
+      {isMenuOpen && <div className="border-t border-slate-800 bg-slate-950 px-4 py-3 sm:hidden"><nav className="grid gap-1">
+        <Link to="/" onClick={() => setIsMenuOpen(false)} className="rounded-xl px-3 py-3 text-sm font-semibold text-slate-200 hover:bg-white/5">Campaigns</Link>
+        {user ? <>
+          <Link to="/dashboard" onClick={() => setIsMenuOpen(false)} className="rounded-xl px-3 py-3 text-sm font-semibold text-slate-200 hover:bg-white/5">Activity</Link>
+          <Link to="/create-campaign" onClick={() => setIsMenuOpen(false)} className="rounded-xl bg-emerald-400 px-3 py-3 text-sm font-bold text-slate-950">Create Campaign</Link>
+          <button onClick={() => { handleLogout(); setIsMenuOpen(false); }} className="rounded-xl px-3 py-3 text-left text-sm font-semibold text-rose-300 hover:bg-rose-500/10">Logout</button>
+        </> : <>
+          <Link to="/login" onClick={() => setIsMenuOpen(false)} className="rounded-xl px-3 py-3 text-sm font-semibold text-slate-200 hover:bg-white/5">Login</Link>
+          <Link to="/register" onClick={() => setIsMenuOpen(false)} className="rounded-xl bg-emerald-400 px-3 py-3 text-sm font-bold text-slate-950">Register</Link>
+        </>}
+      </nav></div>}
     </header>
   );
 };
