@@ -24,7 +24,7 @@ const RegisterPage = () => {
   };
 
   return (
-    <div className="relative min-h-[calc(100vh-72px)] overflow-hidden bg-[#071411]">
+    <div className="crowdfund-register-page relative min-h-[calc(100vh-72px)] overflow-hidden bg-[#071411]">
       <div className="absolute right-[-8rem] top-[-8rem] h-[30rem] w-[30rem] rounded-full bg-emerald-400/15 blur-3xl" />
       <div className="absolute bottom-[-10rem] left-[-6rem] h-[28rem] w-[28rem] rounded-full bg-teal-400/10 blur-3xl" />
       <div className="relative mx-auto grid min-h-[calc(100vh-72px)] max-w-6xl items-center gap-12 px-5 py-10 lg:grid-cols-[0.9fr_1.1fr] lg:px-8">
