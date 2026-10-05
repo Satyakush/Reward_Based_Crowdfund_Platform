@@ -7,6 +7,8 @@ const RegisterPage = () => {
   const [formData, setFormData] = useState({ name: '', email: '', password: '' });
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const EyeIcon = () => <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2.5 12s3.4-6 9.5-6 9.5 6 9.5 6-3.4 6-9.5 6-9.5-6-9.5-6Z" fill="none" stroke="currentColor" strokeWidth="1.8"/><circle cx="12" cy="12" r="2.7" fill="none" stroke="currentColor" strokeWidth="1.8"/></svg>;
+  const EyeOffIcon = () => <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m3 3 18 18M10.6 6.2A10.7 10.7 0 0 1 12 6c6.1 0 9.5 6 9.5 6a17.8 17.8 0 0 1-3.1 3.7M6.2 6.8C3.8 8.3 2.5 12 2.5 12s3.4 6 9.5 6c1.3 0 2.5-.3 3.5-.8" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"/></svg>;
   const navigate = useNavigate();
 
   const onSubmit = async (e) => {
@@ -68,7 +70,7 @@ const RegisterPage = () => {
                 <label key={name} className="block">
                   <span className="text-sm font-bold text-slate-200">{label}</span>
                   <div className="crowdfund-register__control"><input type={name === "password" && showPassword ? "text" : type} name={name} value={formData[name]} onChange={(e) => setFormData({ ...formData, [name]: e.target.value })} required minLength={name === 'password' ? 6 : undefined} autoComplete={autoComplete} placeholder={placeholder}
-                    className="mt-2 w-full rounded-2xl border border-white/10 bg-black/20 px-4 py-3.5 text-white outline-none placeholder:text-slate-600 transition focus:border-emerald-400 focus:ring-4 focus:ring-emerald-400/10" />{name === "password" && <button type="button" className="crowdfund-register__toggle" onClick={() => setShowPassword((value) => !value)}>{showPassword ? "Hide" : "Show"}</button>}</div>
+                    className="mt-2 w-full rounded-2xl border border-white/10 bg-black/20 px-4 py-3.5 text-white outline-none placeholder:text-slate-600 transition focus:border-emerald-400 focus:ring-4 focus:ring-emerald-400/10" />{name === "password" && <button type="button" className="crowdfund-register__toggle" onClick={() => setShowPassword((value) => !value)}>{showPassword ? <EyeOffIcon /> : <EyeIcon />}</button>}</div>
                 </label>
               ))}
               <button disabled={loading} className="group flex w-full items-center justify-center gap-2 rounded-2xl bg-emerald-300 py-3.5 font-black text-slate-950 transition hover:-translate-y-0.5 hover:bg-emerald-200 disabled:opacity-60">
