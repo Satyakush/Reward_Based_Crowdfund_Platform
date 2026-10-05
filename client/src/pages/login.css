@@ -98,3 +98,96 @@
 .crowdfund-login__card{width:min(100%,410px);padding:1.45rem 1.55rem;border-radius:1.25rem}
 .crowdfund-login__form{margin-top:1rem;gap:.7rem}.crowdfund-login__control input{min-height:2.9rem;padding:.65rem .85rem;font-size:.82rem}.crowdfund-login__submit{min-height:2.9rem;font-size:.82rem}.crowdfund-login__footer{margin-top:.9rem;font-size:.72rem}
 @media(max-height:760px) and (min-width:901px){.crowdfund-login__intro h1{font-size:clamp(2.5rem,4.5vw,4.4rem)}.crowdfund-login__intro p{margin-top:.75rem}.crowdfund-login__steps{margin-top:1rem}.crowdfund-login__card{padding:1.2rem 1.35rem}.crowdfund-login__form{margin-top:.8rem;gap:.55rem}}
+
+
+/* Final mobile auth correction: override the desktop min-width column added above. */
+@media (max-width: 900px) {
+  .crowdfund-login {
+    height: auto;
+    min-height: 100dvh;
+    overflow: visible;
+  }
+
+  .crowdfund-login__layout {
+    width: 100%;
+    max-width: 560px;
+    min-height: calc(100dvh - 72px);
+    height: auto;
+    grid-template-columns: minmax(0, 1fr) !important;
+    gap: 0;
+    align-items: center;
+    padding: 1.25rem 1rem 2rem;
+    margin: 0 auto;
+  }
+
+  .crowdfund-login__intro {
+    display: none;
+  }
+
+  .crowdfund-login__card {
+    width: 100%;
+    max-width: 460px;
+    margin: 0 auto;
+    padding: 1.35rem 1.2rem;
+    border-radius: 1.25rem;
+    max-height: none;
+    overflow: visible;
+  }
+
+  .crowdfund-login__mobile-brand {
+    display: block;
+    margin-bottom: 1.25rem;
+  }
+
+  .crowdfund-login__mobile-brand h1 {
+    max-width: none;
+    white-space: normal;
+    word-break: normal;
+    overflow-wrap: break-word;
+  }
+
+  .crowdfund-login__card h2,
+  .crowdfund-login__subtitle,
+  .crowdfund-login__footer {
+    max-width: 100%;
+    white-space: normal;
+    word-break: normal;
+    overflow-wrap: break-word;
+  }
+
+  .crowdfund-login__form,
+  .crowdfund-login__field,
+  .crowdfund-login__control {
+    width: 100%;
+    min-width: 0;
+  }
+
+  .crowdfund-login__control input {
+    width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
+  }
+}
+
+@media (max-width: 480px) {
+  .crowdfund-login__layout {
+    padding: 1rem .75rem 1.5rem;
+  }
+
+  .crowdfund-login__card {
+    padding: 1.15rem 1rem;
+  }
+
+  .crowdfund-login__mobile-brand h1 {
+    font-size: 1.7rem;
+    line-height: 1.1;
+  }
+
+  .crowdfund-login__card h2 {
+    font-size: 1.65rem;
+  }
+
+  .crowdfund-login__form {
+    gap: .8rem;
+  }
+}
