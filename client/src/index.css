@@ -55,3 +55,5 @@ select {
 .crowdfund-register__card{width:min(100%,520px);padding:1.35rem 1.5rem!important;border-radius:1.25rem!important}
 .crowdfund-register__card form{gap:1rem!important}
 @media(max-height:760px) and (min-width:1025px){.crowdfund-register-page>div{gap:1.5rem}.crowdfund-register__card{padding:1.1rem 1.3rem!important}.crowdfund-register__card form{gap:.7rem!important}}
+
+.crowdfund-login__toggle,.crowdfund-register__toggle{width:2rem;height:2rem;display:grid;place-items:center;padding:.35rem;border:0;border-radius:.5rem;background:transparent;color:#34d399;cursor:pointer}.crowdfund-login__toggle svg,.crowdfund-register__toggle svg{width:1.05rem;height:1.05rem;display:block}.crowdfund-login__toggle:hover,.crowdfund-register__toggle:hover{background:rgba(52,211,153,.08)}
