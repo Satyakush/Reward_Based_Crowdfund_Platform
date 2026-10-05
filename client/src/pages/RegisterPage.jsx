@@ -53,7 +53,7 @@ const RegisterPage = () => {
         </section>
 
         <section className="order-1 lg:order-2">
-          <div className="rounded-[2rem] border border-white/10 bg-white/[0.07] p-6 shadow-2xl shadow-black/30 backdrop-blur-xl sm:p-9">
+          <div className="crowdfund-register__card rounded-[1.4rem] border border-white/10 bg-white/[0.07] p-6 shadow-2xl shadow-black/30 backdrop-blur-xl sm:p-8">
             <div className="mb-7">
               <div className="mb-5 inline-flex rounded-full border border-emerald-300/20 bg-emerald-300/10 px-3 py-1.5 text-xs font-black uppercase tracking-[0.15em] text-emerald-300">Create account</div>
               <h2 className="text-3xl font-black tracking-tight text-white">Make your mark.</h2>
