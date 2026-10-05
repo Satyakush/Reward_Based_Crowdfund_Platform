@@ -90,3 +90,11 @@
 
 .crowdfund-login__card{align-self:center;height:max-content;min-height:0;max-height:calc(100dvh - 2.5rem);overflow-y:auto;overscroll-behavior:contain}
 @media(max-width:900px){.crowdfund-login__card{max-height:none;overflow:visible}}
+
+
+/* Compact production auth layout */
+.crowdfund-login__layout{grid-template-columns:minmax(0,1.05fr) minmax(360px,.95fr);gap:clamp(1.5rem,4vw,4rem)}
+.crowdfund-login__intro h1{font-size:clamp(2.8rem,5.2vw,5rem)}.crowdfund-login__intro p{margin-top:1rem}.crowdfund-login__steps{margin-top:1.4rem}
+.crowdfund-login__card{width:min(100%,410px);padding:1.45rem 1.55rem;border-radius:1.25rem}
+.crowdfund-login__form{margin-top:1rem;gap:.7rem}.crowdfund-login__control input{min-height:2.9rem;padding:.65rem .85rem;font-size:.82rem}.crowdfund-login__submit{min-height:2.9rem;font-size:.82rem}.crowdfund-login__footer{margin-top:.9rem;font-size:.72rem}
+@media(max-height:760px) and (min-width:901px){.crowdfund-login__intro h1{font-size:clamp(2.5rem,4.5vw,4.4rem)}.crowdfund-login__intro p{margin-top:.75rem}.crowdfund-login__steps{margin-top:1rem}.crowdfund-login__card{padding:1.2rem 1.35rem}.crowdfund-login__form{margin-top:.8rem;gap:.55rem}}
