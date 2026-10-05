@@ -35,3 +35,17 @@ select {
 .crowdfund-register__control{position:relative}.crowdfund-register__control input{padding-right:4.5rem}.crowdfund-register__toggle{position:absolute;right:.55rem;top:50%;transform:translateY(-35%);border:0;background:transparent;color:#86efac;font-size:.72rem;font-weight:900;cursor:pointer;padding:.45rem}.crowdfund-register__toggle:focus-visible{outline:2px solid #86efac;outline-offset:2px}
 
 .crowdfund-register__card{width:min(100%,620px);height:max-content;max-height:calc(100dvh - 2rem);overflow-y:auto;overscroll-behavior:contain}@media(max-width:1024px){.crowdfund-register__card{max-height:none;overflow:visible}}
+/* Auth viewport: match the scroll-free Disaster reference on normal displays. */
+.crowdfund-register-page{height:calc(100dvh - 72px);min-height:0;overflow:clip}
+.crowdfund-register-page>div{min-height:0;height:100%;overflow:clip}
+.crowdfund-register__card{height:max-content;max-height:none;overflow:visible}
+@media(max-width:1024px){
+  .crowdfund-register-page{height:calc(100dvh - 72px)}
+  .crowdfund-register-page>div{height:100%;grid-template-columns:1fr;align-content:center;padding-top:1rem;padding-bottom:1rem}
+  .crowdfund-register-page>div>section:first-child{display:none}
+  .crowdfund-register__card{width:min(100%,560px)}
+}
+@media(max-height:760px) and (min-width:1025px){
+  .crowdfund-register-page>div{gap:1.5rem;padding-top:1rem;padding-bottom:1rem}
+  .crowdfund-register__card{padding-top:1.25rem!important;padding-bottom:1.25rem!important}
+}
