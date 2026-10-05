@@ -48,3 +48,10 @@ select {
   .crowdfund-register-page>div{gap:1.5rem;padding-top:1rem;padding-bottom:1rem}
   .crowdfund-register__card{padding-top:1.25rem!important;padding-bottom:1.25rem!important}
 }
+
+
+/* Compact production registration surface */
+.crowdfund-register-page>div{gap:clamp(1.5rem,4vw,4rem)}
+.crowdfund-register__card{width:min(100%,520px);padding:1.35rem 1.5rem!important;border-radius:1.25rem!important}
+.crowdfund-register__card form{gap:1rem!important}
+@media(max-height:760px) and (min-width:1025px){.crowdfund-register-page>div{gap:1.5rem}.crowdfund-register__card{padding:1.1rem 1.3rem!important}.crowdfund-register__card form{gap:.7rem!important}}
