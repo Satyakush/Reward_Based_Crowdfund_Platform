@@ -7,6 +7,7 @@
 A full-stack **MERN crowdfunding platform** where creators can launch campaigns and users can support them through reward-based pledges.
 
 <p>
+<a href="https://crowdfund-frontend-one.vercel.app/"><img src="https://img.shields.io/badge/Live%20Demo-2563eb?style=for-the-badge&logo=vercel&logoColor=white" alt="Live Demo"></a>
 <a href="https://github.com/Satyakush/Reward_Based_Crowdfund_Platform"><img src="https://img.shields.io/badge/Source%20Code-111827?style=for-the-badge&logo=github&logoColor=white" alt="Source Code"></a>
 <img src="https://img.shields.io/badge/React-Vite-61DAFB?style=for-the-badge&logo=react&logoColor=111827" alt="React">
 <img src="https://img.shields.io/badge/Node.js-Express-339933?style=for-the-badge&logo=node.js&logoColor=white" alt="Node.js">
@@ -16,6 +17,10 @@ A full-stack **MERN crowdfunding platform** where creators can launch campaigns 
 </div>
 
 ---
+
+## 🌐 Live Platform
+
+**[Launch Crowdfunding Platform →](https://crowdfund-frontend-one.vercel.app/)**
 
 ## 🎯 Project Overview
 
