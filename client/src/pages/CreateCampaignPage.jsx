@@ -3,6 +3,8 @@ import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 
+const campaignImageFallback = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 675"%3E%3Crect width="1200" height="675" fill="%230f172a"/%3E%3Ccircle cx="180" cy="120" r="240" fill="%2310b981" fill-opacity=".25"/%3E%3Ccircle cx="1050" cy="570" r="280" fill="%2338bdf8" fill-opacity=".16"/%3E%3Ctext x="600" y="350" fill="%23d1fae5" font-family="Arial" font-size="42" font-weight="700" text-anchor="middle"%3ECampaign cover preview%3C/text%3E%3C/svg%3E';
+
 const emptyReward = () => ({ title: '', description: '', pledgeAmount: '' });
 
 const CreateCampaignPage = () => {
@@ -46,6 +48,9 @@ const CreateCampaignPage = () => {
   const onSubmit = async (e) => {
     e.preventDefault();
     if (!formData.imageUrl) return toast.error('Add a campaign cover before publishing.');
+    if (!formData.title.trim() || !formData.story.trim()) return toast.error('Add a clear title and story before publishing.');
+    if (Number(formData.goalAmount) <= 0) return toast.error('Funding goal must be greater than zero.');
+    if (!formData.endDate || new Date(formData.endDate).getTime() <= Date.now()) return toast.error('Choose a future campaign end date.');
     if (!formData.rewards.length) return toast.error('Add at least one reward tier.');
 
     setLoading(true);
@@ -108,7 +113,7 @@ const CreateCampaignPage = () => {
 
               <label className="group relative block cursor-pointer overflow-hidden rounded-[1.5rem] border-2 border-dashed border-slate-300 bg-slate-50 transition hover:border-emerald-400 hover:bg-emerald-50/30">
                 {formData.imageUrl ? (
-                  <img src={formData.imageUrl} alt="Campaign preview" className="h-72 w-full object-cover" />
+                  <img src={formData.imageUrl || campaignImageFallback} alt="Campaign preview" onError={(event) => { event.currentTarget.onerror = null; event.currentTarget.src = campaignImageFallback; }} className="h-72 w-full object-cover" />
                 ) : (
                   <div className="flex h-72 flex-col items-center justify-center px-6 text-center">
                     <div className="flex h-16 w-16 items-center justify-center rounded-3xl bg-slate-950 text-2xl text-emerald-300">↥</div>
