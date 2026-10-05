@@ -2,10 +2,12 @@ import { useState } from 'react';
 import axios from 'axios';
 import { Link, useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
+import { useState as usePasswordState } from 'react';
 
 const RegisterPage = () => {
   const [formData, setFormData] = useState({ name: '', email: '', password: '' });
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = usePasswordState(false);
   const navigate = useNavigate();
 
   const onSubmit = async (e) => {
@@ -66,8 +68,8 @@ const RegisterPage = () => {
               ].map(([name, label, placeholder, type, autoComplete]) => (
                 <label key={name} className="block">
                   <span className="text-sm font-bold text-slate-200">{label}</span>
-                  <input type={type} name={name} value={formData[name]} onChange={(e) => setFormData({ ...formData, [name]: e.target.value })} required minLength={name === 'password' ? 6 : undefined} autoComplete={autoComplete} placeholder={placeholder}
-                    className="mt-2 w-full rounded-2xl border border-white/10 bg-black/20 px-4 py-3.5 text-white outline-none placeholder:text-slate-600 transition focus:border-emerald-400 focus:ring-4 focus:ring-emerald-400/10" />
+                  <div className="crowdfund-register__control"><input type={name === "password" && showPassword ? "text" : type} name={name} value={formData[name]} onChange={(e) => setFormData({ ...formData, [name]: e.target.value })} required minLength={name === 'password' ? 6 : undefined} autoComplete={autoComplete} placeholder={placeholder}
+                    className="mt-2 w-full rounded-2xl border border-white/10 bg-black/20 px-4 py-3.5 text-white outline-none placeholder:text-slate-600 transition focus:border-emerald-400 focus:ring-4 focus:ring-emerald-400/10" />{name === "password" && <button type="button" className="crowdfund-register__toggle" onClick={() => setShowPassword((value) => !value)}>{showPassword ? "Hide" : "Show"}</button>}</div>
                 </label>
               ))}
               <button disabled={loading} className="group flex w-full items-center justify-center gap-2 rounded-2xl bg-emerald-300 py-3.5 font-black text-slate-950 transition hover:-translate-y-0.5 hover:bg-emerald-200 disabled:opacity-60">
