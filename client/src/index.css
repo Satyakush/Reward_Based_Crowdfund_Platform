@@ -57,3 +57,24 @@ select {
 @media(max-height:760px) and (min-width:1025px){.crowdfund-register-page>div{gap:1.5rem}.crowdfund-register__card{padding:1.1rem 1.3rem!important}.crowdfund-register__card form{gap:.7rem!important}}
 
 .crowdfund-login__toggle,.crowdfund-register__toggle{width:2rem;height:2rem;display:grid;place-items:center;padding:.35rem;border:0;border-radius:.5rem;background:transparent;color:#34d399;cursor:pointer}.crowdfund-login__toggle svg,.crowdfund-register__toggle svg{width:1.05rem;height:1.05rem;display:block}.crowdfund-login__toggle:hover,.crowdfund-register__toggle:hover{background:rgba(52,211,153,.08)}
+
+/* Responsive application baseline */
+html,body,#root{max-width:100%;overflow-x:clip}
+img,video,canvas{max-width:100%;height:auto}
+svg{max-width:100%}
+pre{max-width:100%;overflow-x:auto}
+table{max-width:100%}
+@media(max-width:1024px){
+  .grid[class~="grid-cols-4"]{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+  .grid[class~="grid-cols-3"]{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+}
+@media(max-width:767px){
+  .grid[class~="grid-cols-4"],.grid[class~="grid-cols-3"],.grid[class~="grid-cols-2"]{grid-template-columns:minmax(0,1fr)!important}
+  table{display:block;overflow-x:auto;white-space:nowrap}
+  main{max-width:100%;overflow-x:clip}
+  [class*="max-w-7xl"]{max-width:100%}
+}
+@media(max-width:480px){
+  input,select,textarea{max-width:100%}
+  button{min-height:42px}
+}
