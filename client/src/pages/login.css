@@ -81,3 +81,8 @@
   .crowdfund-login__layout { padding:1rem; }
   .crowdfund-login__card { padding:1.2rem; border-radius:1.35rem; }
 }
+
+.crowdfund-login__visual { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; opacity:.18; z-index:-2; pointer-events:none; }
+.crowdfund-login__control input.has-toggle { padding-right:4.5rem; }
+.crowdfund-login__toggle { position:absolute; right:.55rem; top:50%; transform:translateY(-50%); border:0; background:transparent; color:#86efac; font-size:.72rem; font-weight:900; cursor:pointer; padding:.45rem; }
+@media (max-width:900px){.crowdfund-login__visual{opacity:.12}.crowdfund-login__layout{padding-top:1.25rem;padding-bottom:1.25rem}}
