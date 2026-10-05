@@ -4,6 +4,8 @@ import CampaignCard from '../components/CampaignCard';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 
+const CAMPAIGNS_CACHE_KEY = 'crowdfund_campaigns_cache_v1';
+
 const campaignFallback = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 450"%3E%3Crect width="800" height="450" fill="%230f172a"/%3E%3Ccircle cx="160" cy="110" r="180" fill="%2310b981" fill-opacity=".25"/%3E%3Ccircle cx="680" cy="360" r="220" fill="%2338bdf8" fill-opacity=".16"/%3E%3Ctext x="400" y="235" fill="%23d1fae5" font-family="Arial" font-size="34" font-weight="700" text-anchor="middle"%3ECampaign cover%3C/text%3E%3C/svg%3E';
 
 const HomePage = () => {
@@ -12,15 +14,37 @@ const HomePage = () => {
   const [error, setError] = useState('');
 
   useEffect(() => {
+    let mounted = true;
+    const cached = sessionStorage.getItem(CAMPAIGNS_CACHE_KEY);
+    if (cached) {
+      try {
+        const parsed = JSON.parse(cached);
+        if (Array.isArray(parsed)) {
+          setCampaigns(parsed);
+          setLoading(false);
+        }
+      } catch {
+        sessionStorage.removeItem(CAMPAIGNS_CACHE_KEY);
+      }
+    }
+
     const fetchCampaigns = async () => {
       try {
-        const { data } = await axios.get('/api/campaigns');
-        setCampaigns(Array.isArray(data) ? data : []);
+        const { data } = await axios.get('/api/campaigns', { timeout: 12000 });
+        if (!mounted) return;
+        const nextCampaigns = Array.isArray(data) ? data : [];
+        setCampaigns(nextCampaigns);
+        sessionStorage.setItem(CAMPAIGNS_CACHE_KEY, JSON.stringify(nextCampaigns));
+        setError('');
       } catch (err) {
-        setError('Could not fetch campaigns.');
-      } finally { setLoading(false); }
+        if (!mounted) return;
+        setError(err.code === 'ECONNABORTED' ? 'The campaign service is taking longer than usual.' : 'Could not fetch campaigns.');
+      } finally {
+        if (mounted) setLoading(false);
+      }
     };
     fetchCampaigns();
+    return () => { mounted = false; };
   }, []);
 
   const stats = useMemo(() => {
@@ -32,8 +56,6 @@ const HomePage = () => {
 
   const containerVariants = { hidden: {}, visible: { transition: { staggerChildren: 0.08 } } };
 
-  if (loading) return <div className="min-h-screen bg-slate-50 px-4 py-10"><div className="mx-auto max-w-7xl animate-pulse"><div className="h-96 rounded-[2rem] bg-slate-200" /><div className="mt-10 h-8 w-64 rounded bg-slate-200" /><div className="mt-6 grid gap-6 md:grid-cols-3">{[1,2,3].map(i => <div key={i} className="h-96 rounded-3xl bg-white" />)}</div></div></div>;
-  if (error) return <div className="flex min-h-[calc(100vh-72px)] items-center justify-center bg-slate-50"><div className="rounded-3xl bg-white p-8 text-center shadow"><p className="text-lg font-black">Something went wrong</p><p className="mt-2 text-sm text-slate-500">{error}</p></div></div>;
 
   return (
     <div className="min-h-[calc(100vh-72px)] bg-slate-50">
@@ -56,7 +78,7 @@ const HomePage = () => {
       </section>
       <section id="campaigns" className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8 lg:py-16">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between"><div><p className="text-sm font-bold uppercase tracking-[0.16em] text-emerald-600">Discover</p><h2 className="mt-2 text-3xl font-black tracking-tight text-slate-900 sm:text-4xl">Projects worth backing</h2><p className="mt-2 text-sm leading-6 text-slate-500 sm:text-base">Browse campaigns and find an idea you want to help move forward.</p></div><span className="w-fit rounded-full bg-white px-4 py-2 text-sm font-bold text-slate-500 shadow-sm ring-1 ring-slate-200">{campaigns.length} {campaigns.length === 1 ? 'campaign' : 'campaigns'}</span></div>
-        {campaigns.length === 0 ? <div className="mt-8 rounded-[2rem] border border-dashed border-slate-300 bg-white p-12 text-center"><div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-emerald-50 text-2xl text-emerald-600">✦</div><h3 className="mt-5 text-xl font-black">Nothing here yet.</h3><p className="mx-auto mt-2 max-w-md text-sm text-slate-500">Be the first creator to bring an idea to the CrowdFund community.</p><Link to="/create-campaign" className="mt-6 inline-flex rounded-xl bg-slate-900 px-5 py-3 text-sm font-bold text-white hover:bg-emerald-600">Launch a campaign</Link></div> : <motion.div className="mt-8 grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3" variants={containerVariants} initial="hidden" animate="visible">{campaigns.map(c => <CampaignCard key={c._id} campaign={{ ...c, imageUrl: c.imageUrl || campaignFallback }} />)}</motion.div>}
+        {error && campaigns.length === 0 ? <div className="mt-8 rounded-[1.5rem] border border-amber-200 bg-amber-50 p-6"><div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between"><div><p className="font-black text-slate-900">Campaigns are taking a moment.</p><p className="mt-1 text-sm text-slate-600">{error} The rest of the platform is ready to use.</p></div><button onClick={() => window.location.reload()} className="rounded-xl bg-slate-900 px-4 py-2.5 text-sm font-bold text-white transition hover:bg-emerald-600">Try again</button></div></div> : loading ? <div className="mt-8 grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">{[1,2,3].map(i => <div key={i} className="h-[28rem] animate-pulse overflow-hidden rounded-[1.75rem] border border-slate-200 bg-white"><div className="h-56 bg-slate-200"/><div className="space-y-3 p-5"><div className="h-5 w-3/4 rounded bg-slate-200"/><div className="h-3 w-full rounded bg-slate-100"/><div className="h-3 w-5/6 rounded bg-slate-100"/><div className="mt-8 h-2 w-full rounded bg-slate-100"/></div></div>)}</div> : campaigns.length === 0 ? <div className="mt-8 rounded-[2rem] border border-dashed border-slate-300 bg-white p-12 text-center"><div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-emerald-50 text-2xl text-emerald-600">✦</div><h3 className="mt-5 text-xl font-black">Nothing here yet.</h3><p className="mx-auto mt-2 max-w-md text-sm text-slate-500">Be the first creator to bring an idea to the CrowdFund community.</p><Link to="/create-campaign" className="mt-6 inline-flex rounded-xl bg-slate-900 px-5 py-3 text-sm font-bold text-white hover:bg-emerald-600">Launch a campaign</Link></div> : <motion.div className="mt-8 grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3" variants={containerVariants} initial="hidden" animate="visible">{campaigns.map(c => <CampaignCard key={c._id} campaign={{ ...c, imageUrl: c.imageUrl || campaignFallback }} />)}</motion.div>}
       </section>
     </div>
   );
