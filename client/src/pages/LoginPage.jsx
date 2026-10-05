@@ -9,6 +9,7 @@ const LoginPage = () => {
   const [formData, setFormData] = useState({ email: "", password: "" });
   const [remember, setRemember] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   const { login } = useContext(AuthContext);
   const navigate = useNavigate();
   const location = useLocation();
@@ -29,6 +30,7 @@ const LoginPage = () => {
 
   return (
     <main className="crowdfund-login">
+      <img className="crowdfund-login__visual" src="/auth-crowdfund.svg" alt="" aria-hidden="true" />
       <div className="crowdfund-login__layout">
         <section className="crowdfund-login__intro">
           <div className="crowdfund-login__eyebrow"><span className="crowdfund-login__dot" /> CrowdFund</div>
@@ -62,7 +64,8 @@ const LoginPage = () => {
             <label className="crowdfund-login__field">
               <span>Password</span>
               <div className="crowdfund-login__control">
-                <input type="password" value={formData.password} onChange={(e) => setFormData({ ...formData, password: e.target.value })} required autoComplete="current-password" placeholder="••••••••" />
+                <input className="has-toggle" type={showPassword ? "text" : "password"} value={formData.password} onChange={(e) => setFormData({ ...formData, password: e.target.value })} required autoComplete="current-password" placeholder="••••••••" />
+                <button type="button" className="crowdfund-login__toggle" onClick={() => setShowPassword((value) => !value)} aria-label={showPassword ? "Hide password" : "Show password"}>{showPassword ? "Hide" : "Show"}</button>
               </div>
             </label>
 
